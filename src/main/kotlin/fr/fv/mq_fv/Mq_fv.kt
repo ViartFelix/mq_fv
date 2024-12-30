@@ -1,9 +1,8 @@
 package fr.fv.mq_fv
 
-import org.bukkit.Bukkit
-import org.bukkit.entity.Display
-import org.bukkit.entity.TextDisplay
+import fr.fv.mq_fv.utils.ConfigurationsHolder
 import org.bukkit.plugin.java.JavaPlugin
+import java.io.File
 
 class Mq_fv : JavaPlugin() {
 
@@ -14,11 +13,33 @@ class Mq_fv : JavaPlugin() {
 
     override fun onEnable() {
         instance = this
-        server.pluginManager.registerEvents(DmgEvent(), this)
-        // Plugin startup logic
+
+        this.registerEvents()
+
+        //get initial yaml config files
+        this.loadConfigFiles()
     }
 
     override fun onDisable() {
-        // Plugin shutdown logic
+    }
+
+    /**
+     * Registers the necessary events
+     */
+    private fun registerEvents()
+    {
+        server.pluginManager.registerEvents(DmgEvent(), this)
+    }
+
+    /**
+     * Loads the configuration of the .yaml and .yml files
+     */
+    private fun loadConfigFiles()
+    {
+        val configMap = hashMapOf(
+            "floating-text" to "floating-text-defaults.yaml"
+        )
+
+        ConfigurationsHolder.instance.loadFromMap(configMap)
     }
 }

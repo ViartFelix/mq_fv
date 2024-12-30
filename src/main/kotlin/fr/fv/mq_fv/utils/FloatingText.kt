@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Display
 import org.bukkit.entity.TextDisplay
 import org.bukkit.util.Vector
@@ -20,21 +21,30 @@ import kotlin.random.Random
  */
 class FloatingText(
     private var location: Location,
-    private var distance: Float = 1.2f,
-    private var backgroundColor: Color = Color.fromARGB(50,255,255,255)
+    private var distance: Float? = null,
+    private var backgroundColor: Color? = null
 ) {
+    /** FloatingText's default values from the yaml file */
+    private var configuration: YamlConfiguration = ConfigurationsHolder.instance.getConfig("floating-text")!!
+
     /** Text content */
     private lateinit var text: Component
 
     /** The TextDisplay */
     private lateinit var display: TextDisplay
 
+    /** Initialises the properties via custom getters */
+    init {
+        this.distance = this.getDistance()
+
+    }
+
     constructor(
         location: Location,
         text: String,
         textColor: NamedTextColor? = null,
-        backgroundColor: Color = Color.fromARGB(50,255,255,255),
-        distance: Float = 1.2f,
+        backgroundColor: Color? = null,
+        distance: Float? = null,
     ) : this(location, distance, backgroundColor) {
 
         //black font color by default
@@ -48,8 +58,8 @@ class FloatingText(
     constructor(
         location: Location,
         text: Component,
-        backgroundColor: Color = Color.fromARGB(50,255,255,255),
-        distance: Float = 1.2f,
+        backgroundColor: Color? = null,
+        distance: Float? = null,
     ) : this(location, distance, backgroundColor) {
         this.text = text
     }
@@ -124,5 +134,25 @@ class FloatingText(
     fun destroy()
     {
         this.display.remove()
+    }
+
+    /**
+     * Returns the set distance
+     */
+    fun getDistance(): Float
+    {
+        //if distance has been set in the object
+        return if(this.distance !== null) {
+            this.distance!!
+        } else {
+            val configValue = this.configuration.get("measure.distance")
+
+            //if any default value in the .yaml file is present
+            if(configValue !== null) {
+                configValue.toString().toFloat()
+            } else {
+                1.2f
+            }
+        }
     }
 }
