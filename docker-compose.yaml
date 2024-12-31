@@ -8,4 +8,45 @@ services:
     ports:
       - "25565:25565"
     volumes:
-      - ./data:/data
+      - ./data/mc:/data
+    restart: on-failure
+    depends_on:
+      - db
+
+  db:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=d61d8327
+      - POSTGRES_DB=mq_fv
+    restart: always
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - ADMINER_DESIGN=hydra
+    depends_on:
+      - db
+
+  # DB migrations
+  flyway:
+    container_name: flyway
+    image: flyway/flyway
+    environment:
+      - FLYWAY_URL=jdbc:postgresql://postgres:5432/mq_fv
+      - FLYWAY_USER=admin
+      - FLYWAY_PASSWORD=d61d8327
+    volumes:
+      - ./files/migrations:/flyway/sql
+    depends_on:
+      - db
+    command: -connectRetries=60 migrate

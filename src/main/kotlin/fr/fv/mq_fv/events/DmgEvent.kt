@@ -1,5 +1,6 @@
-package fr.fv.mq_fv
+package fr.fv.mq_fv.events
 
+import fr.fv.mq_fv.Mq_fv
 import fr.fv.mq_fv.utils.FloatingText
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor

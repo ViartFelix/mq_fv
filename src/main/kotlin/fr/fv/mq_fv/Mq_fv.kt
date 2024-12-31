@@ -1,8 +1,8 @@
 package fr.fv.mq_fv
 
+import fr.fv.mq_fv.events.DmgEvent
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import org.bukkit.plugin.java.JavaPlugin
-import java.io.File
 
 class Mq_fv : JavaPlugin() {
 
