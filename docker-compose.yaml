@@ -11,9 +11,9 @@ services:
       - ./data/mc:/data
     restart: on-failure
     depends_on:
-      - db
+      - postgres
 
-  db:
+  postgres:
     container_name: postgres
     image: postgres:latest
     ports:
@@ -35,7 +35,7 @@ services:
     environment:
       - ADMINER_DESIGN=hydra
     depends_on:
-      - db
+      - postgres
 
   # DB migrations
   flyway:
@@ -48,5 +48,5 @@ services:
     volumes:
       - ./files/migrations:/flyway/sql
     depends_on:
-      - db
+      - postgres
     command: -connectRetries=60 migrate

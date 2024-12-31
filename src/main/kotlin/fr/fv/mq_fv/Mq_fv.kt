@@ -2,6 +2,7 @@ package fr.fv.mq_fv
 
 import fr.fv.mq_fv.events.DmgEvent
 import fr.fv.mq_fv.utils.ConfigurationsHolder
+import fr.fv.mq_fv.utils.DatabaseWrapper
 import org.bukkit.plugin.java.JavaPlugin
 
 class Mq_fv : JavaPlugin() {
@@ -15,9 +16,8 @@ class Mq_fv : JavaPlugin() {
         instance = this
 
         this.registerEvents()
-
-        //get initial yaml config files
         this.loadConfigFiles()
+        this.initDbConnection()
     }
 
     override fun onDisable() {
@@ -37,9 +37,18 @@ class Mq_fv : JavaPlugin() {
     private fun loadConfigFiles()
     {
         val configMap = hashMapOf(
-            "floating-text" to "floating-text-defaults.yaml"
+            "floating-text" to "floating-text-defaults.yaml",
+            "database" to "database.yaml"
         )
 
         ConfigurationsHolder.instance.loadFromMap(configMap)
+    }
+
+    /**
+     * Initiates the Database connection (creates the singleton)
+     */
+    private fun initDbConnection()
+    {
+        DatabaseWrapper.instance.testConnection()
     }
 }

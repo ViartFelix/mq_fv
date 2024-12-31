@@ -1,0 +1,7 @@
+connection:
+  host: postgres
+  port: 5432
+  user: admin
+  password: d61d8327
+  db_name: mq_fv
+  type: postgresql

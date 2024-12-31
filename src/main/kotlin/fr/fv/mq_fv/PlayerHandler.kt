@@ -1,7 +1,5 @@
 package fr.fv.mq_fv
 
-import fr.fv.mq_fv.utils.Database
-
 /**
  * Class to handle the player and methods
  */

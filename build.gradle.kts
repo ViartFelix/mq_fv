@@ -17,10 +17,20 @@ repositories {
     }
 }
 
+var ktormVersion = "4.0.0"
+
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
+
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("dev.dejvokep:boosted-yaml:1.3.6")
+
+    compileOnly("org.ktorm:ktorm-core:4.1.1")
+
+    //database-related
+    //implementation("org.ktorm:ktorm-core:4.1.1")
+    //implementation("io.ktor:ktor-server-core")
+    //implementation("io.ktor:ktor-server-netty")
 }
 
 val targetJavaVersion = 21
@@ -44,6 +54,7 @@ tasks {
 
     shadowJar {
         archiveClassifier.set("") // Ensures this is the primary JAR
+
         // Include Kotlin runtime
         dependencies {
             include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
