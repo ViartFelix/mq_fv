@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
 class DmgEvent(): Listener {
 
     @EventHandler
-    public fun onDamageEvent(event: EntityDamageByEntityEvent) {
+    fun onDamageEvent(event: EntityDamageByEntityEvent) {
         val finalIcon: Char = this.getPrependIcon(event.isCritical)
         val finalTextColor: NamedTextColor = this.getTextColor(event.isCritical)
         val finalBackgroundColor: Color = this.getBackgroundColor(event.isCritical)
@@ -21,19 +21,17 @@ class DmgEvent(): Listener {
         val finalString = "$finalIcon ${event.finalDamage.roundToInt()}"
         val textComponent: Component = Component.text(finalString).color(finalTextColor)
 
-        var floatingText: FloatingText? = FloatingText(
+        var floatingTextComponent: FloatingText? = FloatingText(
             event.entity.location,
             textComponent,
             finalBackgroundColor,
             1f,
-        )
-
-        floatingText?.display()
+        ).display()
 
         //clear the text after
         Bukkit.getScheduler().runTaskLater(Mq_fv.instance, Runnable {
-            floatingText?.destroy()
-            floatingText = null
+            floatingTextComponent?.destroy()
+            floatingTextComponent = null
         }, 30L)
     }
 

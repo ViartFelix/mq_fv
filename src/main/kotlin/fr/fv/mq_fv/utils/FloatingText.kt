@@ -6,8 +6,9 @@ import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.entity.Display
+import org.bukkit.entity.Display.Billboard
 import org.bukkit.entity.TextDisplay
+import org.bukkit.entity.TextDisplay.TextAlignment
 import org.bukkit.util.Vector
 import kotlin.math.cos
 import kotlin.math.sin
@@ -35,8 +36,8 @@ class FloatingText(
 
     /** Initialises the properties via custom getters */
     init {
-        this.distance = this.getDistance()
-
+        this.distance ?: this.getDefaultDistance()
+        this.backgroundColor ?: this.getDefaultBackgroundColor()
     }
 
     constructor(
@@ -47,8 +48,7 @@ class FloatingText(
         distance: Float? = null,
     ) : this(location, distance, backgroundColor) {
 
-        //black font color by default
-        val finalColor = textColor ?: NamedTextColor.BLACK
+        val finalColor = textColor ?: this.getDefaultFontColor()
 
         this.text = Component
             .text(text)
@@ -67,17 +67,19 @@ class FloatingText(
     /**
      * Builds the armor stand and displays the text.
      */
-    fun display() {
+    fun display(): FloatingText {
         val world = this.getWorld()
         val coordinates: Location = this.calculateCoordinates()
 
         this.display = world.spawn(coordinates, TextDisplay::class.java) { entity ->
             entity.text(this.text)
-            entity.billboard = Display.Billboard.VERTICAL
+            entity.billboard = this.getDefaultBillboardInclinaison()
             entity.backgroundColor = this.backgroundColor
             entity.isSeeThrough = true
-            entity.alignment = TextDisplay.TextAlignment.CENTER
+            entity.alignment = this.getDefaultTextAlignement()
         }
+
+        return this
     }
 
     /**
@@ -89,7 +91,7 @@ class FloatingText(
         val lookAngle = this.location.direction
 
         //we decide of a random angle (180° angle max to display in front of the player)
-        val randomAngleDegrees: Double = Random.nextDouble(0.0, 180.0)
+        val randomAngleDegrees: Double = Random.nextDouble(0.0, this.getMaxAngle())
         val randomAngleRadiant: Double = Math.toRadians(randomAngleDegrees)
 
         //and apply that angle to the distance set
@@ -97,8 +99,8 @@ class FloatingText(
         val oppositeLength = this.calculateZLength(randomAngleRadiant, lookAngle)
 
         //random increment in the final height
-        val randomHeightIncrement: Double = Random.nextDouble(0.0, 0.75)
-        val finalHeightIncrement = 1.1 + randomHeightIncrement
+        val randomHeightIncrement: Double = Random.nextDouble(0.0, this.getMaxBonusIncrement())
+        val finalHeightIncrement = this.getInitialIncrement() + randomHeightIncrement
 
         target.add(adjacentLength, finalHeightIncrement, oppositeLength)
 
@@ -110,7 +112,7 @@ class FloatingText(
      */
     private fun calculateXLength(angle: Double, direction: Vector): Double
     {
-        return (direction.x * cos(angle) - direction.z * sin(angle)) * this.distance
+        return (direction.x * cos(angle) - direction.z * sin(angle)) * this.distance!!
     }
 
     /**
@@ -118,14 +120,7 @@ class FloatingText(
      */
     private fun calculateZLength(angle: Double, direction: Vector): Double
     {
-        return (direction.x * sin(angle) + direction.z * cos(angle)) * this.distance
-    }
-
-    /**
-     * Gets the world where the Location object is
-     */
-    fun getWorld(): World {
-        return this.location.world
+        return (direction.x * sin(angle) + direction.z * cos(angle)) * this.distance!!
     }
 
     /**
@@ -137,22 +132,111 @@ class FloatingText(
     }
 
     /**
+     * Gets the world where the Location object is
+     */
+    fun getWorld(): World {
+        return this.location.world
+    }
+
+    /**
      * Returns the set distance
      */
-    fun getDistance(): Float
+    fun getDefaultDistance(): Float
     {
-        //if distance has been set in the object
-        return if(this.distance !== null) {
-            this.distance!!
-        } else {
-            val configValue = this.configuration.get("measure.distance")
+        val configValue = this.configuration.get("measure.distance")
 
-            //if any default value in the .yaml file is present
-            if(configValue !== null) {
-                configValue.toString().toFloat()
+        //if distance has been set in the object
+        return if(configValue !== null) {
+            configValue.toString().toFloat()
+        } else {
+            1.2f
+        }
+    }
+
+    /**
+     * Returns the initial bloc increment (default is 1.1)
+     */
+    fun getInitialIncrement(): Float = (this.configuration.get("measure.initial_increment") ?: 1.1f).toString().toFloat()
+
+    /**
+     * Returns the max bonus vertical increment of the text (default is 0.75)
+     */
+    fun getMaxBonusIncrement(): Double = (this.configuration.get("measure.max_bonus_increment") ?: 0.75f).toString().toDouble()
+
+    /**
+     * Returns the maximum angle in which the text can appear (default is 180.0)
+     */
+    fun getMaxAngle(): Double = (this.configuration.get("measure.angle") ?: 180).toString().toDouble()
+
+    /**
+     * Calculates the default argb background color of the floating text.
+     */
+    private fun getDefaultBackgroundColor(): Color
+    {
+        //fallback BG from the class itself
+        val fallbackBG = Color.fromARGB(50,255,255,255)
+
+        //color in the .yaml file)
+        val configColor = this.configuration.getConfigurationSection("colors.background")
+
+        return if (configColor != null) {
+            if(!configColor.contains("a")) {
+                fallbackBG
             } else {
-                1.2f
+                //return the colors in the yaml config file
+
+                val alpha = configColor.getInt("a")
+                val r = (configColor.get("r") ?: 255).toString().toInt()
+                val g = (configColor.get("g") ?: 255).toString().toInt()
+                val b = (configColor.get("b") ?: 255).toString().toInt()
+
+                Color.fromARGB(alpha, r, g, b)
             }
+        } else {
+            fallbackBG
+        }
+    }
+
+    /**
+     * Returns the default named text color for the font of the text
+     */
+    fun getDefaultFontColor(): NamedTextColor
+    {
+        val fallbackColor = NamedTextColor.BLACK
+        val configTextColor = this.configuration.get("colors.text")
+
+        return if(configTextColor != null) {
+            //named color or fallback color
+            NamedTextColor.NAMES.value(configTextColor.toString().lowercase()) ?: fallbackColor
+        } else {
+            fallbackColor
+        }
+    }
+
+    /**
+     * Returns the default Display.Billboard inclinaison for the textDisplay entity
+     */
+    fun getDefaultBillboardInclinaison(): Billboard
+    {
+        val fallbackBillboard = Billboard.VERTICAL
+        val configInclinaison = this.configuration.get("entity.billboard")
+
+        return if (configInclinaison != null) {
+            Billboard.entries.firstOrNull { it.name == configInclinaison } ?: fallbackBillboard
+        } else {
+            fallbackBillboard
+        }
+    }
+
+    fun getDefaultTextAlignement(): TextAlignment
+    {
+        val fallbackAlignement = TextAlignment.CENTER
+        val configTextAlignment = this.configuration.get("entity.text_alignement")
+
+        return if(configTextAlignment != null) {
+            TextAlignment.entries.firstOrNull { it.name == configTextAlignment } ?: fallbackAlignement
+        } else {
+            fallbackAlignement
         }
     }
 }

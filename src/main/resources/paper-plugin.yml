@@ -1,5 +1,5 @@
 name: mq_fv
-version: '0.0.1'
+version: '0.0.2'
 main: fr.fv.mq_fv.Mq_fv
 api-version: '1.21'
 load: STARTUP
