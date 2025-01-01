@@ -4,8 +4,6 @@ import fr.fv.mq_fv.exceptions.DatabaseException
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.ktorm.database.Database
-import java.sql.Connection
-import java.sql.DriverManager
 
 /**
  * Database wrapper to communicate with the database.
@@ -43,6 +41,23 @@ private constructor() {
         val instance : DatabaseWrapper by lazy {
             DatabaseWrapper()
         }
+
+        /**
+         * Returns the connection via the instance
+         */
+        fun getDatabase(): Database
+        {
+            //set the database instance
+            if(this.instance !is DatabaseWrapper) {
+                throw DatabaseException("DatabaseWrapper is not instantiated.")
+            }
+
+            if(this.instance.connection !is Database) {
+                throw DatabaseException("Database Ktorm connection is not instantiated.")
+            }
+
+            return this.instance.connection
+        }
     }
 
     /** Current DB Ktorm connection */
@@ -57,7 +72,6 @@ private constructor() {
 
         this.initKtormConnection()
 
-        //test if the connection is good or not
         this.testConnection()
     }
 
@@ -79,23 +93,40 @@ private constructor() {
     }
 
     /**
-     * Test if the database is contactable
+     * Test if the database is contactable.
      */
     fun testConnection()
     {
         try {
+            val dbErrorPrefix = "Database connection test failed"
+
             this.connection.useConnection { connection ->
-                val statement = connection.createStatement()
-                val resultSet = statement.executeQuery("SELECT 1")
+                //connection test addition
+                val calcOne = 50
+                val calcTwo = 99
+                val expectedResult = 149
+
+                val resultSet = connection
+                    .createStatement()
+                    .executeQuery("SELECT ${calcOne}+${calcTwo} AS test_result")
+
                 if (resultSet.next()) {
-                    println("Database connection test successful. Result: ${resultSet.getInt(1)}")
+                    val actualResult = resultSet.getInt("test_result")
+
+                    if(expectedResult != actualResult) {
+                        throw DatabaseException("${dbErrorPrefix}: expected result '${expectedResult}', got '${actualResult}' from the DB.")
+                    }
                 } else {
-                    throw DatabaseException("Database connection test failed: no result from test query.")
+                    throw DatabaseException("${dbErrorPrefix}: no result from test query.")
                 }
             }
+        } catch (e: DatabaseException) {
+            e.printStackTrace()
+            throw e
         } catch (e: Exception) {
             e.printStackTrace()
-            throw DatabaseException("Cannot connect to database.")
+
+            throw DatabaseException("Cannot connect to database. Reason: ${e}")
         }
     }
 

@@ -42,11 +42,10 @@ services:
     container_name: flyway
     image: flyway/flyway
     environment:
-      - FLYWAY_URL=jdbc:postgresql://postgres:5432/mq_fv
-      - FLYWAY_USER=admin
-      - FLYWAY_PASSWORD=d61d8327
+      - FLYWAY_CLEAN_DISABLED=false
     volumes:
       - ./files/migrations:/flyway/sql
+      - ./files/flyway.toml:/flyway/conf/flyway.toml
     depends_on:
       - postgres
-    command: -connectRetries=60 migrate
+    command: clean migrate

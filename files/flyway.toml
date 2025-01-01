@@ -1,0 +1,7 @@
+[environments.default]
+url = "jdbc:postgresql://postgres:5432/mq_fv"
+user = "admin"
+password = "d61d8327"
+
+cleanDisabled = false
+connectRetries = 60

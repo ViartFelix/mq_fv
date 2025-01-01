@@ -15,6 +15,7 @@ class Mq_fv : JavaPlugin() {
     override fun onEnable() {
         instance = this
 
+        this.loadClasses()
         this.registerEvents()
         this.loadConfigFiles()
         this.initDbConnection()
@@ -50,5 +51,14 @@ class Mq_fv : JavaPlugin() {
     private fun initDbConnection()
     {
         DatabaseWrapper.instance.testConnection()
+    }
+
+    /**
+     * Loads classes that doesn't load.
+     * I don't know why postgres driver won't load
+     */
+    private fun loadClasses()
+    {
+        Class.forName("org.postgresql.Driver")
     }
 }

@@ -18,7 +18,7 @@ ENV MODE=creative
 
 # Adding plugins to the server
 RUN mkdir /_build
-COPY ./build/libs/mq_fv-0.0.1.jar /_build
-ENV PLUGINS=/_build/mq_fv-0.0.1.jar
+COPY ./build/libs/mq_fv.jar /_build
+ENV PLUGINS=/_build/mq_fv.jar
 
 EXPOSE 25565
