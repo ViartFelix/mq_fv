@@ -1,6 +1,7 @@
 package fr.fv.mq_fv
 
 import fr.fv.mq_fv.events.DmgEvent
+import fr.fv.mq_fv.events.OnPlayerJoin
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import fr.fv.mq_fv.utils.DatabaseWrapper
 import org.bukkit.plugin.java.JavaPlugin
@@ -16,9 +17,10 @@ class Mq_fv : JavaPlugin() {
         instance = this
 
         this.loadClasses()
-        this.registerEvents()
         this.loadConfigFiles()
         this.initDbConnection()
+
+        this.registerEvents()
     }
 
     override fun onDisable() {
@@ -30,6 +32,7 @@ class Mq_fv : JavaPlugin() {
     private fun registerEvents()
     {
         server.pluginManager.registerEvents(DmgEvent(), this)
+        server.pluginManager.registerEvents(OnPlayerJoin(), this)
     }
 
     /**
