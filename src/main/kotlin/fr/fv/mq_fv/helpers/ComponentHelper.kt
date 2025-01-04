@@ -1,4 +1,4 @@
-package fr.fv.mq_fv.utils
+package fr.fv.mq_fv.helpers
 
 import fr.fv.mq_fv.exceptions.ComponentHelperException
 import net.kyori.adventure.text.Component

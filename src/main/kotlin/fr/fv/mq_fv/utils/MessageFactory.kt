@@ -1,5 +1,6 @@
 package fr.fv.mq_fv.utils
 
+import fr.fv.mq_fv.helpers.ComponentHelper
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.TextColor

@@ -1,9 +1,9 @@
-package fr.fv.mq_fv
+package fr.fv.mq_fv.handlers
 
 import fr.fv.mq_fv.exceptions.DatabaseException
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.repositories.PlayerRepository
-import fr.fv.mq_fv.utils.PotionEffectsHelper
+import fr.fv.mq_fv.helpers.PotionEffectsHelper
 import org.bukkit.entity.Player
 
 /**

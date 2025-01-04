@@ -1,6 +1,5 @@
-package fr.fv.mq_fv.utils
+package fr.fv.mq_fv.handlers
 
-import fr.fv.mq_fv.PlayerHandler
 import org.bukkit.entity.Player
 
 /**

@@ -1,4 +1,4 @@
-package fr.fv.mq_fv.utils
+package fr.fv.mq_fv.helpers
 
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType

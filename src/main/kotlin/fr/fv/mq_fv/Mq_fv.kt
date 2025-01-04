@@ -4,7 +4,7 @@ import fr.fv.mq_fv.listeners.DmgEvent
 import fr.fv.mq_fv.listeners.OnPlayerJoin
 import fr.fv.mq_fv.listeners.OnTabRefreshRequest
 import fr.fv.mq_fv.runnable.TabRefreshRunnable
-import fr.fv.mq_fv.utils.AllPlayersHandlerHolder
+import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import fr.fv.mq_fv.utils.DatabaseWrapper
 import org.bukkit.plugin.java.JavaPlugin
