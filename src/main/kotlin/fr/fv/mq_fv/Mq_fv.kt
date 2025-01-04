@@ -1,10 +1,15 @@
 package fr.fv.mq_fv
 
-import fr.fv.mq_fv.events.DmgEvent
-import fr.fv.mq_fv.events.OnPlayerJoin
+import fr.fv.mq_fv.events.TabRefreshRequestEvent
+import fr.fv.mq_fv.listeners.DmgEvent
+import fr.fv.mq_fv.listeners.OnPlayerJoin
+import fr.fv.mq_fv.listeners.OnTabRefreshRequest
+import fr.fv.mq_fv.runnable.TabRefreshRunnable
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import fr.fv.mq_fv.utils.DatabaseWrapper
+import io.papermc.paper.util.Tick
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitScheduler
 
 class Mq_fv : JavaPlugin() {
 
@@ -13,14 +18,17 @@ class Mq_fv : JavaPlugin() {
             private set
     }
 
+    lateinit var scheduler: BukkitScheduler
+        private set
+
     override fun onEnable() {
         instance = this
 
         this.loadClasses()
         this.loadConfigFiles()
         this.initDbConnection()
-
         this.registerEvents()
+        this.registerRunners()
     }
 
     override fun onDisable() {
@@ -33,6 +41,7 @@ class Mq_fv : JavaPlugin() {
     {
         server.pluginManager.registerEvents(DmgEvent(), this)
         server.pluginManager.registerEvents(OnPlayerJoin(), this)
+        server.pluginManager.registerEvents(OnTabRefreshRequest(), this)
     }
 
     /**
@@ -57,11 +66,21 @@ class Mq_fv : JavaPlugin() {
     }
 
     /**
-     * Loads classes that doesn't load.
-     * I don't know why postgres driver won't load
+     * Loads necessary classes.
      */
     private fun loadClasses()
     {
+        this.scheduler = this.server.scheduler
+
         Class.forName("org.postgresql.Driver")
+    }
+
+    /**
+     * Registers the runners of the plugin
+     */
+    private fun registerRunners()
+    {
+        //tab refresh
+        TabRefreshRunnable().runTaskTimer(this, 20L, 60L)
     }
 }

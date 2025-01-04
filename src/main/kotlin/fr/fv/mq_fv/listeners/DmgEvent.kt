@@ -1,4 +1,4 @@
-package fr.fv.mq_fv.events
+package fr.fv.mq_fv.listeners
 
 import fr.fv.mq_fv.Mq_fv
 import fr.fv.mq_fv.utils.FloatingText
