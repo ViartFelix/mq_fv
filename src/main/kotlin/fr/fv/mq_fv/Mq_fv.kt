@@ -1,13 +1,12 @@
 package fr.fv.mq_fv
 
-import fr.fv.mq_fv.events.TabRefreshRequestEvent
 import fr.fv.mq_fv.listeners.DmgEvent
 import fr.fv.mq_fv.listeners.OnPlayerJoin
 import fr.fv.mq_fv.listeners.OnTabRefreshRequest
 import fr.fv.mq_fv.runnable.TabRefreshRunnable
+import fr.fv.mq_fv.utils.AllPlayersHandlerHolder
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import fr.fv.mq_fv.utils.DatabaseWrapper
-import io.papermc.paper.util.Tick
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitScheduler
 
@@ -66,13 +65,15 @@ class Mq_fv : JavaPlugin() {
     }
 
     /**
-     * Loads necessary classes.
+     * Loads necessary classes and singletons.
      */
     private fun loadClasses()
     {
         this.scheduler = this.server.scheduler
 
         Class.forName("org.postgresql.Driver")
+
+        AllPlayersHandlerHolder.instance
     }
 
     /**

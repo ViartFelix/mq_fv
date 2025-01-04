@@ -10,7 +10,7 @@ import org.ktorm.schema.varchar
 /**
  * Player DB entity (Ktorm)
  */
-object Players : Table<PlayerTable>("player") {
+object PlayerEntity : Table<PlayerTable>("player") {
     var uuid = uuid("uuid").bindTo { it.uuid }
     var name = varchar("name").bindTo { it.name }
     var money = decimal("money").bindTo { it.money }

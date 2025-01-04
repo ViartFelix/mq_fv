@@ -1,11 +1,11 @@
 package fr.fv.mq_fv.repositories
 
-import fr.fv.mq_fv.entities.Players
-import fr.fv.mq_fv.entities.Players.uuid
+import fr.fv.mq_fv.entities.PlayerEntity
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import org.ktorm.dsl.eq
 import org.ktorm.entity.add
 import org.ktorm.entity.any
+import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 import java.math.BigDecimal
 import org.bukkit.entity.Player as McPlayer
@@ -17,7 +17,7 @@ class PlayerRepository : Repository() {
      */
     fun isPlayerRegistered(player: McPlayer): Boolean
     {
-        return database.sequenceOf(Players).any {
+        return database.sequenceOf(PlayerEntity).any {
             it.uuid eq player.uniqueId
         }
     }
@@ -27,7 +27,7 @@ class PlayerRepository : Repository() {
      */
     fun registerPlayer(player: McPlayer)
     {
-        database.sequenceOf(Players).add(
+        database.sequenceOf(PlayerEntity).add(
             PlayerTable {
                 uuid = player.uniqueId
                 name = player.name
@@ -37,10 +37,14 @@ class PlayerRepository : Repository() {
     }
 
     /**
-     * Tran
+     * Returns the data of the player from the DB
      */
-    fun mcPlayerAsEntity()
+    fun getPlayer(player: McPlayer): PlayerTable?
     {
-
+        return database
+            .sequenceOf(PlayerEntity)
+            .find { db -> player.uniqueId eq db.uuid }
     }
+
+
 }
