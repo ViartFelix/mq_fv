@@ -3,7 +3,7 @@ package fr.fv.mq_fv.listeners
 import fr.fv.mq_fv.Mq_fv
 import fr.fv.mq_fv.repositories.PlayerRepository
 import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
-import fr.fv.mq_fv.utils.MessageFactory
+import fr.fv.mq_fv.utils.ComponentFactory
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -16,7 +16,7 @@ class OnPlayerJoin(): Listener {
 
     private val playerRepository: PlayerRepository = PlayerRepository()
 
-    private val messageFactory: MessageFactory = MessageFactory()
+    private val messageFactory: ComponentFactory = ComponentFactory()
 
     @EventHandler
     fun onPlayerJoinHandler(event: PlayerJoinEvent) {

@@ -11,14 +11,15 @@ ENV GID=1000
 # Server configuration
 ENV EULA=TRUE
 ENV TYPE=PAPER
-ENV VERSION=1.21.3
+ENV VERSION=1.20.6
 
 # Other server params
 ENV MODE=creative
 
-# Adding plugins to the server
-RUN mkdir /_build
-COPY ./build/libs/mq_fv.jar /_build
-ENV PLUGINS=/_build/mq_fv.jar
+# Adding main plugin
+COPY ./build/libs/mq_fv.jar /plugins
+
+# Adding other necessary plugins to the server (dependencies)
+ADD https://github.com/dmulloy2/ProtocolLib/releases/download/5.3.0/ProtocolLib.jar /plugins
 
 EXPOSE 25565

@@ -63,6 +63,5 @@ private constructor() {
 
         return filterResult is PlayerHandler
     }
-
 }
 

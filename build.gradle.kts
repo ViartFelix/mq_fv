@@ -17,25 +17,33 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/") {
         name = "sonatype"
     }
+    maven("https://repo.dmulloy2.net/repository/public/")
 }
 
-var ktormVersion = "4.0.0"
+val ktormVersion = "4.1.1"
+val postgresqlAdapterVersion = "42.7.4"
+val protocolLibVersion = "5.3.0"
+val boostedYamlVersion = "1.3.6"
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
 
     //kotlin's librairies
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation ("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 
-    implementation("dev.dejvokep:boosted-yaml:1.3.6")
+    implementation("dev.dejvokep:boosted-yaml:${boostedYamlVersion}")
 
     //ktorm
-    implementation("org.ktorm:ktorm-core:4.1.1")
-    implementation("org.ktorm:ktorm-support-postgresql:4.1.1")
+    implementation("org.ktorm:ktorm-core:${ktormVersion}")
+    implementation("org.ktorm:ktorm-support-postgresql:${ktormVersion}")
 
     //postgresql
-    implementation("org.postgresql:postgresql:42.7.4")
+    implementation("org.postgresql:postgresql:${postgresqlAdapterVersion}")
+
+    //protocolLib
+    //implementation("com.comphenix.protocol:ProtocolLib:${protocolLibVersion}")
+    compileOnly("com.comphenix.protocol:ProtocolLib:${protocolLibVersion}")
 }
 
 val targetJavaVersion = 21
@@ -72,6 +80,10 @@ tasks {
 
             //postgresql
             include(dependency("org.postgresql:postgresql"))
+        }
+
+        dependencies {
+            //exclude(dependency("com.comphenix.protocol:ProtocolLib"))
         }
     }
 }

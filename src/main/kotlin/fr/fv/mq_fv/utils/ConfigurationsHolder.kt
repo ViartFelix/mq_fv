@@ -24,13 +24,13 @@ private constructor()
     /**
      * Returns a configuration if exists
      */
-    fun getConfig(name: String): YamlConfiguration?
+    fun getConfig(name: String): YamlConfiguration
     {
         if(! this.configurations.containsKey(name) ) {
             throw RuntimeException("The configuration $name does not exist.")
         }
 
-        return this.configurations[name]
+        return this.configurations[name]!!
     }
 
     /**

@@ -4,6 +4,8 @@ import fr.fv.mq_fv.exceptions.DatabaseException
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.repositories.PlayerRepository
 import fr.fv.mq_fv.helpers.PotionEffectsHelper
+import fr.fv.mq_fv.utils.ComponentFactory
+import fr.fv.mq_fv.utils.ConfigurationsHolder
 import org.bukkit.entity.Player
 
 /**
@@ -27,6 +29,8 @@ class PlayerHandler (
     /** Potion effect factory */
     val potionEffectsHelper: PotionEffectsHelper = PotionEffectsHelper()
 
+    val componentFactory: ComponentFactory = ComponentFactory()
+
     init {
         //fetch the player
         val fetchedPlayer = playerRepository.getPlayer(this.mcPlayer)
@@ -45,5 +49,28 @@ class PlayerHandler (
         val player = this.mcPlayer
 
         player.addPotionEffect(potionEffectsHelper.getInfiniteNightVision())
+    }
+
+    /**
+     * Updates the player tab for that player
+     */
+    fun updatePlayerTab()
+    {
+        val configServerName = ConfigurationsHolder.instance
+            .getConfig("tab-list")
+            .getString("options.server_name")!!
+
+        mcPlayer.sendPlayerListHeader(
+            componentFactory.buildPlayerTabHeader(this.mcPlayer, configServerName)
+        )
+
+        //addFakePlayer(mcPlayer, "balls")
+    }
+
+    /**
+     * Adds a fake player to the scoreboard
+     */
+    fun addFakePlayer(player: Player, fakeName: String) {
+
     }
 }

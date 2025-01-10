@@ -1,6 +1,5 @@
 package fr.fv.mq_fv.runnable
 
-import fr.fv.mq_fv.Mq_fv
 import fr.fv.mq_fv.events.TabRefreshRequestEvent
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable
@@ -11,7 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable
 class TabRefreshRunnable: BukkitRunnable() {
 
     override fun run() {
-        //if any player is on the server
+        //if any player is on the server then call the event
 
         if( !Bukkit.getOnlinePlayers().isEmpty() ) {
             val tabRefreshRequestEvent = TabRefreshRequestEvent()

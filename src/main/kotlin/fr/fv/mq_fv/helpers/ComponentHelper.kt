@@ -35,7 +35,7 @@ class ComponentHelper {
             }
         }
 
-        return finalComponent;
+        return finalComponent
     }
 
     /**
@@ -76,8 +76,32 @@ class ComponentHelper {
             finalComponent = finalComponent.append(currentComponent)
         }
 
-        return finalComponent;
+        return finalComponent
     }
 
+    /**
+     * Returns spaces for specified length
+     */
+    fun repeatingSpaces(length: Int): TextComponent
+    {
+        if(length <= 0) throw ComponentHelperException("Length of the repeating spaces is less than 1.")
 
+        var finalComponent = Component.text("")
+
+        for (i in 0 until length) {
+            finalComponent = finalComponent.append(
+                Component.text(" ")
+            )
+        }
+
+        return finalComponent
+    }
+
+    /**
+     * Returns a new line
+     */
+    fun newLine(): Component
+    {
+        return Component.text("").appendNewline()
+    }
 }
