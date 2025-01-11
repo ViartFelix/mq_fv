@@ -81,9 +81,5 @@ tasks {
             //postgresql
             include(dependency("org.postgresql:postgresql"))
         }
-
-        dependencies {
-            //exclude(dependency("com.comphenix.protocol:ProtocolLib"))
-        }
     }
 }

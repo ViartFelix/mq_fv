@@ -17,9 +17,9 @@ ENV VERSION=1.20.6
 ENV MODE=creative
 
 # Adding main plugin
-COPY ./build/libs/mq_fv.jar /plugins
+COPY --chmod=755 ./build/libs/mq_fv.jar /plugins/
 
-# Adding other necessary plugins to the server (dependencies)
-ADD https://github.com/dmulloy2/ProtocolLib/releases/download/5.3.0/ProtocolLib.jar /plugins
+# Adding dependencies of the main plugin
+ADD --chmod=755 https://github.com/dmulloy2/ProtocolLib/releases/download/5.3.0/ProtocolLib.jar /plugins/
 
 EXPOSE 25565

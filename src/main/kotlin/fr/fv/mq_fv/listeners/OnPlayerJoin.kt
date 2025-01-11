@@ -18,6 +18,8 @@ class OnPlayerJoin(): Listener {
 
     private val messageFactory: ComponentFactory = ComponentFactory()
 
+    private val allPlayersHandlerHolder: AllPlayersHandlerHolder = AllPlayersHandlerHolder.instance
+
     @EventHandler
     fun onPlayerJoinHandler(event: PlayerJoinEvent) {
         this.event = event
@@ -30,7 +32,7 @@ class OnPlayerJoin(): Listener {
         }
 
         //create a new playerHandler
-        AllPlayersHandlerHolder.instance.createPlayerHandler(joinPlayer)
+        this.allPlayersHandlerHolder.createPlayerHandler(joinPlayer)
     }
 
     /**
@@ -43,7 +45,7 @@ class OnPlayerJoin(): Listener {
             val welcomeMessage = messageFactory.getNewPlayerMessage(event.player.name)
 
             Bukkit.getOnlinePlayers().forEach() {
-                    player -> player.sendMessage(welcomeMessage)
+                player -> player.sendMessage(welcomeMessage)
             }
         }, 40L)
     }

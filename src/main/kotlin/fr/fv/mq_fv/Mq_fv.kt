@@ -3,6 +3,7 @@ package fr.fv.mq_fv
 import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
 import fr.fv.mq_fv.interfaces.EventsRegisterer
 import fr.fv.mq_fv.listeners.DmgEvent
+import fr.fv.mq_fv.listeners.OnPlayerDisconnect
 import fr.fv.mq_fv.listeners.OnPlayerJoin
 import fr.fv.mq_fv.listeners.OnTabRefreshRequest
 import fr.fv.mq_fv.runnable.TabRefreshRunnable
@@ -40,6 +41,7 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
         server.pluginManager.registerEvents(DmgEvent(), this)
         server.pluginManager.registerEvents(OnPlayerJoin(), this)
         server.pluginManager.registerEvents(OnTabRefreshRequest(), this)
+        server.pluginManager.registerEvents(OnPlayerDisconnect(), this)
 
         //ProtocolLibHelper.instance.registerEvents()
     }
@@ -72,6 +74,8 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
     private fun loadClasses()
     {
         this.scheduler = this.server.scheduler
+
+        Class.forName("org.postgresql.Driver")
 
         AllPlayersHandlerHolder.instance
     }
