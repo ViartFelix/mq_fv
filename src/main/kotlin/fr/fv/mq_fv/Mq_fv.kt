@@ -1,5 +1,7 @@
 package fr.fv.mq_fv
 
+import fr.fv.mq_fv.commands.BoomCommand
+import fr.fv.mq_fv.commands.ChatCommand
 import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
 import fr.fv.mq_fv.interfaces.EventsRegisterer
 import fr.fv.mq_fv.listeners.DmgEvent
@@ -9,9 +11,14 @@ import fr.fv.mq_fv.listeners.OnTabRefreshRequest
 import fr.fv.mq_fv.runnable.TabRefreshRunnable
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import fr.fv.mq_fv.utils.DatabaseWrapper
+import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
+import io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitScheduler
-
+import kotlin.random.Random
 
 class Mq_fv : JavaPlugin(), EventsRegisterer {
 
@@ -43,6 +50,20 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
         server.pluginManager.registerEvents(OnTabRefreshRequest(), this)
         server.pluginManager.registerEvents(OnPlayerDisconnect(), this)
 
+        val manager: LifecycleEventManager<Plugin> = this.getLifecycleManager()
+
+        manager.registerEventHandler<ReloadableRegistrarEvent<Commands?>>(LifecycleEvents.COMMANDS) { event ->
+            val commands = event.registrar()
+
+            if (commands != null) {
+                commands.register("boom", "cock and balls", BoomCommand())
+                commands.register("chat", "WOW", ChatCommand())
+            }
+        }
+
+
+
+
         //ProtocolLibHelper.instance.registerEvents()
     }
 
@@ -58,6 +79,11 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
         )
 
         ConfigurationsHolder.instance.loadFromMap(configMap)
+    }
+
+    fun isMuted(): Boolean
+    {
+        return Random.nextBoolean()
     }
 
     /**

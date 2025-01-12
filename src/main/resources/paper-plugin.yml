@@ -4,3 +4,16 @@ main: fr.fv.mq_fv.Mq_fv
 api-version: '1.20'
 load: STARTUP
 depend: [ProtocolLib]
+debug: true
+
+dependencies:
+  bootstrap:
+    ProtocolLib:
+      load: BEFORE
+      required: true
+      join-classpath: true # Defaults to true
+  server:
+    ProtocolLib:
+      load: BEFORE
+      required: true
+      join-classpath: true # Defaults to true

@@ -1,6 +1,6 @@
 options:
   # Time (s) between each refresh
-  refresh: 0.35
+  refresh: 2
   # Time (s) after which the refresh begins
-  initial_delay: 5
+  initial_delay: 8
   server_name: John elden ring
