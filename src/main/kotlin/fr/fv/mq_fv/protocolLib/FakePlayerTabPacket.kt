@@ -23,13 +23,15 @@ class FakePlayerTabPacket( val targetPlayer: Player, val fakeName: String ): Sen
             EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE, EnumWrappers.PlayerInfoAction.UPDATE_LATENCY,
             EnumWrappers.PlayerInfoAction.UPDATE_LISTED))
 
+        val fakeProfile = WrappedGameProfile(UUID.randomUUID(), fakeName)
+
         testPacket.playerInfoDataLists.write(1, listOf(
             PlayerInfoData(
                 UUID.randomUUID(),
-                1,
+                -1, //no network bar in the right side
                 true,
                 EnumWrappers.NativeGameMode.SURVIVAL,
-                WrappedGameProfile.fromPlayer(targetPlayer),
+                fakeProfile,
                 WrappedChatComponent.fromText(fakeName)
             )
         ))
