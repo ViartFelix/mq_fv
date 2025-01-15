@@ -2,6 +2,7 @@ package fr.fv.mq_fv
 
 import fr.fv.mq_fv.commands.BoomCommand
 import fr.fv.mq_fv.commands.ChatCommand
+import fr.fv.mq_fv.commands.TabCommand
 import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
 import fr.fv.mq_fv.interfaces.EventsRegisterer
 import fr.fv.mq_fv.listeners.DmgEvent
@@ -37,6 +38,7 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
         this.loadConfigFiles()
         this.initDbConnection()
         this.registerEvents()
+        this.registerCommands()
         this.registerRunners()
     }
 
@@ -50,21 +52,27 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
         server.pluginManager.registerEvents(OnTabRefreshRequest(), this)
         server.pluginManager.registerEvents(OnPlayerDisconnect(), this)
 
-        val manager: LifecycleEventManager<Plugin> = this.getLifecycleManager()
-
-        manager.registerEventHandler<ReloadableRegistrarEvent<Commands?>>(LifecycleEvents.COMMANDS) { event ->
-            val commands = event.registrar()
-
-            if (commands != null) {
-                commands.register("boom", "cock and balls", BoomCommand())
-                commands.register("chat", "WOW", ChatCommand())
-            }
-        }
-
-
 
 
         //ProtocolLibHelper.instance.registerEvents()
+    }
+
+    /**
+     * Registers the necessary custom commands to the server
+     */
+    private fun registerCommands()
+    {
+        val lifecycleEventManager: LifecycleEventManager<Plugin> = this.getLifecycleManager()
+
+        lifecycleEventManager.registerEventHandler<ReloadableRegistrarEvent<Commands?>>(LifecycleEvents.COMMANDS) { event ->
+            val commands = event.registrar()
+
+            if (commands != null) {
+                commands.register("boom", "AND KABOLOOIE", BoomCommand())
+                commands.register("chat", "among us", ChatCommand())
+                commands.register("tab", "Adds a fake player to the tab", TabCommand())
+            }
+        }
     }
 
     /**
@@ -79,11 +87,6 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
         )
 
         ConfigurationsHolder.instance.loadFromMap(configMap)
-    }
-
-    fun isMuted(): Boolean
-    {
-        return Random.nextBoolean()
     }
 
     /**

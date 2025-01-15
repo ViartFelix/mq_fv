@@ -20,7 +20,7 @@ ENV MODE=creative
 COPY --chmod=777 ./build/libs/mq_fv.jar /plugins/
 
 # Adding dependencies of the main plugin
-ADD --chmod=777 https://github.com/dmulloy2/ProtocolLib/releases/download/5.3.0/ProtocolLib.jar /plugins/
-# ADD --chmod=777 https://ci.dmulloy2.net/job/ProtocolLib/lastSuccessfulBuild/artifact/build/libs/ProtocolLib.jar /plugins/
+# ADD --chmod=777 https://github.com/dmulloy2/ProtocolLib/releases/download/5.3.0/ProtocolLib.jar /plugins/
+ADD --chmod=777 https://ci.dmulloy2.net/job/ProtocolLib/lastSuccessfulBuild/artifact/build/libs/ProtocolLib.jar /plugins/
 
 EXPOSE 25565
