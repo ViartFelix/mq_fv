@@ -10,7 +10,7 @@ class TabCommand: BasicCommand {
         if( stack.sender is Player ) {
             val player = stack.sender as Player
 
-            val packet = FakePlayerTabPacket(player, "John")
+            val packet = FakePlayerTabPacket("John")
             packet.buildPacket()
             packet.sendPacket(player)
         }

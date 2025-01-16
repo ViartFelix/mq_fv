@@ -1,6 +1,7 @@
 package fr.fv.mq_fv.tabList
 
 import com.comphenix.protocol.wrappers.WrappedChatComponent
+import fr.fv.mq_fv.protocolLib.FakePlayerTabPacket
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -14,6 +15,8 @@ class SingleTabListPlayer(
      */
     fun sendPacketToPlayer(player: Player)
     {
-
+        val tabPlayerPacket = FakePlayerTabPacket(displayName, uuid)
+        tabPlayerPacket.buildPacket()
+        tabPlayerPacket.sendPacket(player)
     }
 }

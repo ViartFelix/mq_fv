@@ -4,15 +4,21 @@ class TabListColumn(
     final val index: Int,
     final val maxCapacity: Int = 20
 ) {
-    private val allPlayers: HashMap<Int, SingleTabListPlayer> = HashMap(maxCapacity)
-
+    /** All players (or fake players) in that column */
+    var allPlayers: HashMap<Int, SingleTabListPlayer> = HashMap(maxCapacity)
+        private set
 
     /**
-     * Initialises the column of the tab list
+     * Gets a player (or fake player) at index
      */
-    private fun initColumn()
-    {
-
+    fun getAtIndex(index: Int): SingleTabListPlayer {
+        return allPlayers[index]!!
     }
 
+    /**
+     * Edits a player at the index
+     */
+    fun setAtIndex(index: Int, player: SingleTabListPlayer) {
+        allPlayers[index] = player
+    }
 }

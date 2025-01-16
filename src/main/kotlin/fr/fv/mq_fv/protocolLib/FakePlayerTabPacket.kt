@@ -12,7 +12,24 @@ import java.util.*
 /**
  * Creates a new player in the tab list
  */
-class FakePlayerTabPacket( val targetPlayer: Player, val fakeName: String ): SendablePacket, BuildablePacket, AbstractPacket() {
+class FakePlayerTabPacket(
+    private val uuid: UUID = UUID.randomUUID(),
+): SendablePacket, BuildablePacket, AbstractPacket() {
+
+    lateinit var displayedName: WrappedChatComponent
+    lateinit var name: String
+
+    constructor(name: String, uuid: UUID = UUID.randomUUID()) : this(uuid)
+    {
+        this.name = name
+        this.displayedName = WrappedChatComponent.fromText(name)
+    }
+
+    constructor(name: WrappedChatComponent, uuid: UUID = UUID.randomUUID()) : this(uuid)
+    {
+        this.displayedName = name
+        this.name = displayedName.json.text
+    }
 
     override fun buildPacket()
     {
@@ -23,16 +40,16 @@ class FakePlayerTabPacket( val targetPlayer: Player, val fakeName: String ): Sen
             EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE, EnumWrappers.PlayerInfoAction.UPDATE_LATENCY,
             EnumWrappers.PlayerInfoAction.UPDATE_LISTED))
 
-        val fakeProfile = WrappedGameProfile(UUID.randomUUID(), fakeName)
+        val fakeProfile = WrappedGameProfile(uuid, name)
 
         testPacket.playerInfoDataLists.write(1, listOf(
             PlayerInfoData(
-                UUID.randomUUID(),
+                uuid,
                 -1, //no network bar in the right side
                 true,
                 EnumWrappers.NativeGameMode.SURVIVAL,
                 fakeProfile,
-                WrappedChatComponent.fromText(fakeName)
+                displayedName
             )
         ))
 
@@ -40,7 +57,13 @@ class FakePlayerTabPacket( val targetPlayer: Player, val fakeName: String ): Sen
     }
 
     override fun sendPacket(player: Player) {
-        //println("Packet details: $packet")
         manager.sendServerPacket(player, packet)
+    }
+
+    /**
+     * Returns the text in the wrapped component
+     */
+    private fun getTextFromJson(component: String): String {
+        //TODO
     }
 }
