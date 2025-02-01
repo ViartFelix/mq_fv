@@ -1,9 +1,12 @@
 package fr.fv.mq_fv.handlers
 
+import com.comphenix.protocol.ProtocolLibrary
+import com.comphenix.protocol.ProtocolManager
 import fr.fv.mq_fv.exceptions.DatabaseException
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.repositories.PlayerRepository
 import fr.fv.mq_fv.helpers.PotionEffectsHelper
+import fr.fv.mq_fv.tabList.TabListHandler
 import fr.fv.mq_fv.utils.ComponentFactory
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import org.bukkit.entity.Player
@@ -29,7 +32,14 @@ class PlayerHandler (
     /** Potion effect factory */
     val potionEffectsHelper: PotionEffectsHelper = PotionEffectsHelper()
 
+    /** Component factory */
     val componentFactory: ComponentFactory = ComponentFactory()
+
+    /** ProtocolLib manager */
+    val manager: ProtocolManager = ProtocolLibrary.getProtocolManager()
+
+    /** Tab list manager for that player */
+    val tabList: TabListHandler = TabListHandler()
 
     init {
         //fetch the player
@@ -39,6 +49,10 @@ class PlayerHandler (
         this.playerEntity = fetchedPlayer
 
         this.applyPotionEffects()
+
+        this.tabList.initTabList()
+        this.tabList.updateRightInfoTab(this.playerEntity)
+        this.tabList.sendAllPackets(this.mcPlayer)
     }
 
     /**
@@ -60,17 +74,12 @@ class PlayerHandler (
             .getConfig("tab-list")
             .getString("options.server_name")!!
 
+        //header
         mcPlayer.sendPlayerListHeader(
             componentFactory.buildPlayerTabHeader(this.mcPlayer, configServerName)
         )
 
-        //addFakePlayer(mcPlayer, "balls")
-    }
-
-    /**
-     * Adds a fake player to the scoreboard
-     */
-    fun addFakePlayer(player: Player, fakeName: String) {
-
+        this.tabList.updateRightInfoTab(this.playerEntity)
+        this.tabList.sendAllPackets(this.mcPlayer)
     }
 }

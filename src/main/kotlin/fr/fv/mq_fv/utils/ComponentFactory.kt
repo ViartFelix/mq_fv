@@ -3,8 +3,10 @@ package fr.fv.mq_fv.utils
 import fr.fv.mq_fv.helpers.ComponentHelper
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import java.math.BigDecimal
 import org.bukkit.entity.Player as mcPlayer
 
 class ComponentFactory {
@@ -108,7 +110,33 @@ class ComponentFactory {
                 Component.text(ping).color(pingColor)
             )
             .append(Component.text(" ms"))
+    }
 
+    /**
+     * Builds a component for players' money in the tab
+     */
+    fun buildTabMoneyComponent(money: BigDecimal): TextComponent
+    {
+        return Component.text()
+            //money icon
+            .append(Component.text().content("$").color(NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+            .append(Component.text(" "))
+
+            //money
+            .append(Component.text().content(
+                money.toString()
+            ).color(NamedTextColor.GOLD))
+            .build()
+    }
+
+    /**
+     * Returns the money title for the tab list
+     */
+    fun buildTabMoneyTitleComponent(moneyTitle: String): TextComponent
+    {
+        return Component.text()
+            .append(Component.text().content(moneyTitle).color(NamedTextColor.GOLD))
+            .build()
     }
 
 

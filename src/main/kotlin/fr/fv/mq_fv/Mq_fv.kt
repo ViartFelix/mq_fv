@@ -12,7 +12,6 @@ import fr.fv.mq_fv.utils.DatabaseWrapper
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitScheduler
 
-
 class Mq_fv : JavaPlugin(), EventsRegisterer {
 
     companion object {
@@ -42,8 +41,6 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
         server.pluginManager.registerEvents(OnPlayerJoin(), this)
         server.pluginManager.registerEvents(OnTabRefreshRequest(), this)
         server.pluginManager.registerEvents(OnPlayerDisconnect(), this)
-
-        //ProtocolLibHelper.instance.registerEvents()
     }
 
     /**

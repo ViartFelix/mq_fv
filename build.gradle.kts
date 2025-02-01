@@ -24,9 +24,10 @@ val ktormVersion = "4.1.1"
 val postgresqlAdapterVersion = "42.7.4"
 val protocolLibVersion = "5.3.0"
 val boostedYamlVersion = "1.3.6"
+val mcVersion = "1.20.6"
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:${mcVersion}-R0.1-SNAPSHOT")
 
     //kotlin's librairies
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

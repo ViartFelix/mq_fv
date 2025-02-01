@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mq_fv.iml" filepath="$PROJECT_DIR$/.idea/modules/mq_fv.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fr.fv.mq_fv.main.iml" filepath="$PROJECT_DIR$/.idea/modules/fr.fv.mq_fv.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mc-analyser/mc-analyser.iml" filepath="$PROJECT_DIR$/mc-analyser/mc-analyser.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/mq_fv.main.iml" filepath="$PROJECT_DIR$/.idea/modules/mq_fv.main.iml" />
     </modules>
   </component>
