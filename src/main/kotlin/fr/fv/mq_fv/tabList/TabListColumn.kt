@@ -1,11 +1,13 @@
 package fr.fv.mq_fv.tabList
 
+import com.comphenix.protocol.wrappers.WrappedChatComponent
+
 class TabListColumn(
-    final val index: Int,
-    final val maxCapacity: Int = 20
+    private val index: Int,
+    private val maxCapacity: Int = 20
 ) {
     /** All players (or fake players) in that column */
-    var allPlayers: HashMap<Int, SingleTabListPlayer> = HashMap(maxCapacity)
+    var allPlayers: LinkedHashMap<Int, SingleTabListPlayer> = LinkedHashMap(maxCapacity)
         private set
 
     /**
@@ -20,5 +22,20 @@ class TabListColumn(
      */
     fun setAtIndex(index: Int, player: SingleTabListPlayer) {
         allPlayers[index] = player
+    }
+
+    /**
+     * Initiates this column and all fake players
+     */
+    fun initColumn()
+    {
+        for (i in 0..<this.maxCapacity) {
+            val baseIndex = index * maxCapacity
+
+            this.allPlayers[i] = SingleTabListPlayer(
+                WrappedChatComponent.fromText(" "),
+                baseIndex + i
+            )
+        }
     }
 }

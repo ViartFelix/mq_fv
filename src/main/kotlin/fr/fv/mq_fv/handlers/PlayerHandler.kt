@@ -6,7 +6,7 @@ import fr.fv.mq_fv.exceptions.DatabaseException
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.repositories.PlayerRepository
 import fr.fv.mq_fv.helpers.PotionEffectsHelper
-import fr.fv.mq_fv.protocolLib.FakeExposition
+import fr.fv.mq_fv.tabList.TabListHandler
 import fr.fv.mq_fv.utils.ComponentFactory
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import org.bukkit.entity.Player
@@ -38,6 +38,9 @@ class PlayerHandler (
     /** ProtocolLib manager */
     val manager: ProtocolManager = ProtocolLibrary.getProtocolManager()
 
+    /** Tab list manager for that player */
+    val tabList: TabListHandler = TabListHandler()
+
     init {
         //fetch the player
         val fetchedPlayer = playerRepository.getPlayer(this.mcPlayer)
@@ -46,6 +49,10 @@ class PlayerHandler (
         this.playerEntity = fetchedPlayer
 
         this.applyPotionEffects()
+
+        this.tabList.initTabList()
+        this.tabList.updateRightInfoTab(this.playerEntity)
+        this.tabList.sendAllPackets(this.mcPlayer)
     }
 
     /**
@@ -67,19 +74,12 @@ class PlayerHandler (
             .getConfig("tab-list")
             .getString("options.server_name")!!
 
-        /*
-
-        val p = FakeExposition(mcPlayer)
-        p.buildPacket()
-        p.sendPacket(mcPlayer)
-
+        //header
         mcPlayer.sendPlayerListHeader(
             componentFactory.buildPlayerTabHeader(this.mcPlayer, configServerName)
         )
 
-        val fakePlayer = FakePlayerTabPacket(mcPlayer, "WOW")
-        fakePlayer.buildPacket()
-        fakePlayer.sendPacket(mcPlayer)
-         */
+        this.tabList.updateRightInfoTab(this.playerEntity)
+        this.tabList.sendAllPackets(this.mcPlayer)
     }
 }

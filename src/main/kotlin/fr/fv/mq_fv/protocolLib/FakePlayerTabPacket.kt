@@ -14,21 +14,19 @@ import java.util.*
  */
 class FakePlayerTabPacket(
     private val uuid: UUID = UUID.randomUUID(),
+    private val name: String,
 ): SendablePacket, BuildablePacket, AbstractPacket() {
 
     lateinit var displayedName: WrappedChatComponent
-    lateinit var name: String
 
-    constructor(name: String, uuid: UUID = UUID.randomUUID()) : this(uuid)
+    constructor(name: String, uuid: UUID = UUID.randomUUID()) : this(uuid, name)
     {
-        this.name = name
         this.displayedName = WrappedChatComponent.fromText(name)
     }
 
-    constructor(name: WrappedChatComponent, uuid: UUID = UUID.randomUUID()) : this(uuid)
+    constructor(displayName: WrappedChatComponent, name: String, uuid: UUID = UUID.randomUUID()) : this(uuid, name)
     {
-        this.displayedName = name
-        this.name = displayedName.json.text
+        this.displayedName = displayName
     }
 
     override fun buildPacket()
@@ -38,7 +36,7 @@ class FakePlayerTabPacket(
         val testPacket = PacketContainer(PacketType.Play.Server.PLAYER_INFO)
         testPacket.playerInfoActions.write(0, EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER,
             EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE, EnumWrappers.PlayerInfoAction.UPDATE_LATENCY,
-            EnumWrappers.PlayerInfoAction.UPDATE_LISTED))
+            EnumWrappers.PlayerInfoAction.UPDATE_LISTED, EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME))
 
         val fakeProfile = WrappedGameProfile(uuid, name)
 
@@ -58,12 +56,5 @@ class FakePlayerTabPacket(
 
     override fun sendPacket(player: Player) {
         manager.sendServerPacket(player, packet)
-    }
-
-    /**
-     * Returns the text in the wrapped component
-     */
-    private fun getTextFromJson(component: String): String {
-        //TODO
     }
 }
