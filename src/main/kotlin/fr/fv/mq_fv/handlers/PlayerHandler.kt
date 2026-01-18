@@ -12,9 +12,7 @@ import fr.fv.mq_fv.stats.PlayerStatistic
 import fr.fv.mq_fv.tabList.TabListHandler
 import fr.fv.mq_fv.utils.ComponentFactory
 import fr.fv.mq_fv.utils.ConfigurationsHolder
-import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Player
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 
 /**
  * Class to handle the player's actions and other things
@@ -46,6 +44,7 @@ class PlayerHandler (
     /** Tab list manager for that player */
     val tabList: TabListHandler = TabListHandler()
 
+    /** Holds the statistics of the current player */
     val playerStats: PlayerStatsHolder = PlayerStatsHolder()
 
     init {
@@ -100,8 +99,8 @@ class PlayerHandler (
         val targetHealth = playerStats.getTargetStat( PlayerStatistic.LIFE )
 
         if( 0 >= targetHealth.amount - finalDamageCalculation.toFloat() ) {
+            mcPlayer.damage(0.0)
             mcPlayer.health = 0.0
-            mcPlayer.damage(0.1)
         }
     }
 }
