@@ -1,6 +1,7 @@
 package fr.fv.mq_fv.listeners
 
 import fr.fv.mq_fv.Mq_fv
+import fr.fv.mq_fv.dto.DamageCalculationResult
 import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
 import fr.fv.mq_fv.utils.FloatingText
 import net.kyori.adventure.text.Component
@@ -24,6 +25,8 @@ class DmgEvent(): Listener {
 
         if( EntityType.PLAYER === event.damager.type ) {
             this.handleWhenDamagerIsPlayer(event)
+        } else if( event.damager is LivingEntity ) {
+            this.handleWhenDamagerIsLivingEntity(event)
         }
     }
 
@@ -38,12 +41,17 @@ class DmgEvent(): Listener {
 
         val damageCalculationResult = targetPlayerHandler.playerStats.calculateDamage()
 
-        // if damagee is another player
+        // player -> player
         if( EntityType.PLAYER == event.entity.type ) {
             // the target player
-            val targetDamageePlayerHandler = playerHandlerInstance.getPlayerHandler(event.entity as Player)!!
+            val targetPlayerDamagee = event.entity as Player
+            val targetDamageePlayerHandler = playerHandlerInstance.getPlayerHandler(targetPlayerDamagee)!!
+
             targetDamageePlayerHandler.requestDamageToThisPlayer(damageCalculationResult)
-        } else if( event.entity is LivingEntity ) {
+            this.applyKnockBackToDamagee(targetPlayerDamagee, targetDamager)
+        }
+        // player -> mob
+        else if( event.entity is LivingEntity ) {
             val targetEntity = event.entity as LivingEntity
 
             if( 0 >= targetEntity.health - damageCalculationResult.damage ) {
@@ -51,6 +59,7 @@ class DmgEvent(): Listener {
             } else {
                 //apply the damage to the target
                 targetEntity.health -= damageCalculationResult.damage
+                this.applyKnockBackToDamagee(targetEntity, targetDamager)
             }
         }
 
@@ -59,6 +68,45 @@ class DmgEvent(): Listener {
             damageCalculationResult.isCritical,
             event.entity.location
         )
+    }
+
+    /**
+     * Handles the damage event when the damager is a living entity (a mob, **not a player**)
+     */
+    private fun handleWhenDamagerIsLivingEntity(event: EntityDamageByEntityEvent)
+    {
+        val targetDamager = event.damager as LivingEntity
+        val damagee = event.entity
+
+        // mob -> player
+        if( damagee is Player ) {
+            // the target player
+            val targetPlayerDamagee = event.entity as Player
+            val targetDamageePlayerHandler = AllPlayersHandlerHolder.instance.getPlayerHandler(targetPlayerDamagee)!!
+
+            val calculationRequest = DamageCalculationResult(
+                damage = event.damage,
+                isCritical = event.isCritical
+            )
+
+            targetDamageePlayerHandler.requestDamageToThisPlayer(calculationRequest)
+            this.displayDamageFloatingText(calculationRequest.damage, calculationRequest.isCritical, damagee.location)
+            this.applyKnockBackToDamagee(targetPlayerDamagee, targetDamager)
+        }
+        // mob -> mob
+        else if( damagee is LivingEntity ) {
+            this.displayDamageFloatingText(event.damage, event.isCritical, damagee.location)
+            val finalTargetHealth = damagee.health - event.damage
+
+            if( 0 >= finalTargetHealth ) {
+                damagee.health = 0.0
+            } else {
+                damagee.health -= event.damage
+                this.applyKnockBackToDamagee(damagee, targetDamager)
+            }
+
+            this.applyKnockBackToDamagee(damagee, targetDamager)
+        }
     }
 
     /**
@@ -85,6 +133,21 @@ class DmgEvent(): Listener {
             floatingTextComponent?.destroy()
             floatingTextComponent = null
         }, 30L)
+    }
+
+    /**
+     * Applies a knock back to the damagee target
+     */
+    private fun applyKnockBackToDamagee(
+        target: LivingEntity, origin: LivingEntity, strength: Double = 0.4, yBoost: Double = 0.75
+    ) {
+        val direction = target.location.toVector()
+            .subtract(origin.location.toVector())
+            .normalize()
+
+        direction.y = yBoost
+
+        target.velocity = direction.multiply(strength)
     }
 
     private fun getPrependIcon(isCritical: Boolean): Char = if(isCritical)
