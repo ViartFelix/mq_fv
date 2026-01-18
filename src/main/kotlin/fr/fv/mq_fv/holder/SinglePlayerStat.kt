@@ -96,4 +96,8 @@ class SinglePlayerStat(
 
         return request
     }
+
+    override fun toString(): String {
+        return "SinglePlayerStat(amount=$amount, stat=$stat)"
+    }
 }

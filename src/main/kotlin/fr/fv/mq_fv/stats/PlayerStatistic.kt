@@ -8,11 +8,13 @@ import net.kyori.adventure.text.format.TextColor
 enum class PlayerStatistic(
     val symbol: String,
     val color: TextColor,
-    val decimalAmount: Int = 0
+    val displayIndex: Int,
+    val modifierIndex: Int,
+    val decimalAmount: Int = 0,
 ) {
-    LIFE("♥", TextColor.color(225, 50, 50), 0),
-    DEFENCE("⛊", TextColor.color(114, 209, 110), 0),
-    ATTACK("✹", TextColor.color(242, 151, 82), 0),
-    CRITICAL_CHANCE("◈", TextColor.color(88, 131, 239), 2),
-    CRITICAL_DAMAGE("◉", TextColor.color(88, 131, 239), 2)
+    LIFE("♥", TextColor.color(225, 50, 50), 1, 999),
+    DEFENCE("⛊", TextColor.color(114, 209, 110), 2, 1),
+    ATTACK("✹", TextColor.color(242, 151, 82), 3, 1),
+    CRITICAL_CHANCE("◈", TextColor.color(88, 131, 239), 4, 2, 2),
+    CRITICAL_DAMAGE("◉", TextColor.color(88, 131, 239), 5, 3, 2)
 }

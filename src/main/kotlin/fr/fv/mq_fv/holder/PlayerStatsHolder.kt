@@ -11,24 +11,36 @@ class PlayerStatsHolder {
 
     /** Base statistics */
     val stats: List<SinglePlayerStat> = listOf(
-        SinglePlayerStat(5.0f, PlayerStatistic.DEFENCE),
         SinglePlayerStat(100.0f, PlayerStatistic.LIFE),
+        SinglePlayerStat(5.0f, PlayerStatistic.DEFENCE),
+
         SinglePlayerStat(10.0f, PlayerStatistic.ATTACK),
         SinglePlayerStat(30.0f, PlayerStatistic.CRITICAL_CHANCE),
         SinglePlayerStat(75.0f, PlayerStatistic.CRITICAL_DAMAGE),
     )
 
     /**
+     * Returns an ordered list for the modifiers application
+     */
+    fun getModifiersOrder(): List<SinglePlayerStat> = stats.sortedBy { it.stat.modifierIndex }
+
+    /**
+     * Returns an ordered list for the tab list
+     */
+    fun getTabListOrder(): List<SinglePlayerStat> = stats.sortedBy { it.stat.displayIndex }
+
+    /**
      * Returns a map containing the stat and the string representation of said stat
      */
-    fun toMapString(): Map<PlayerStatistic, String>
+    fun toMapString(list: List<SinglePlayerStat>): Map<PlayerStatistic, String>
     {
+        //println("to map string for the tab list")
+        //println(list)
         val targetMap = HashMap<PlayerStatistic, String>()
 
-        this.stats
-            .forEach {
-                targetMap[it.stat] = it.amountToString()
-            }
+        list.forEach {
+            targetMap[it.stat] = it.amountToString()
+        }
 
         return targetMap
     }
@@ -47,10 +59,14 @@ class PlayerStatsHolder {
     {
         var finalRequest = damageRequest.copy()
 
-        this.stats
-            .forEach {
-                finalRequest = it.applyDefenceModifier(finalRequest)
-            }
+        val modif = getModifiersOrder()
+
+        //println("damage reduction for calculation")
+        //println(modif)
+
+        modif.forEach {
+            finalRequest = it.applyDefenceModifier(finalRequest)
+        }
 
         return damageRequest.damage
     }
@@ -62,23 +78,22 @@ class PlayerStatsHolder {
     {
         var calculatedDamage = DamageCalculationResult(damage = 1.0, isCritical = false)
 
+        val modif = getModifiersOrder()
+
+        //println("attack modifiers")
+        //println(modif)
+
         // apply modifiers
-        this.stats
-            .forEach {
-                calculatedDamage = it.applyDamageModifier(calculatedDamage)
-            }
+        modif.forEach {
+            calculatedDamage = it.applyDamageModifier(calculatedDamage)
+        }
 
         return calculatedDamage
     }
 
-    fun getSafeTargetStat(stat: PlayerStatistic): SinglePlayerStat?
-    {
-        return stats.find { stat == it.stat }
-    }
+    fun getSafeTargetStat(stat: PlayerStatistic): SinglePlayerStat? = stats.find { stat == it.stat }
 
-    fun getTargetStat(stat: PlayerStatistic): SinglePlayerStat
-    {
-        return this.getSafeTargetStat(stat)
-            ?: throw PlayerStatisticException("Player statistic '${stat.name}' is not found in the holder.")
-    }
+    fun getTargetStat(stat: PlayerStatistic): SinglePlayerStat =
+        this.getSafeTargetStat(stat) ?:
+            throw PlayerStatisticException("Player statistic '${stat.name}' is not found in the holder.")
 }

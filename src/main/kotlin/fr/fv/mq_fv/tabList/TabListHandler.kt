@@ -5,7 +5,6 @@ import com.comphenix.protocol.wrappers.WrappedChatComponent
 import fr.fv.mq_fv.holder.PlayerStatsHolder
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.protocolLib.FakePlayerCollectionPacket
-import fr.fv.mq_fv.stats.PlayerStatistic
 import fr.fv.mq_fv.utils.ComponentFactory
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
@@ -95,12 +94,12 @@ class TabListHandler {
 
         // title
         this.setComponentToTabList(
-            componentFactory.buildStatsTabHeader("Statistics", 5), statsColumn, ++currentRowIndex
+            componentFactory.buildStatsTabHeader("Statistics", 5), statsColumn, currentRowIndex++
         )
 
         // the target stats
         statistics
-            .toMapString()
+            .toMapString(statistics.getTabListOrder())
             .forEach {
                 if( currentRowIndex <= 19 ) {
                     this.setComponentToTabList(
