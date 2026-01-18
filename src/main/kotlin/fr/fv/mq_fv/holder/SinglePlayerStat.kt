@@ -47,13 +47,12 @@ class SinglePlayerStat(
      */
     private fun handleWhenTypeIsAttack(calculation: DamageCalculationResult): DamageCalculationResult
     {
-        val baseDamage = calculation.damage;
+        val baseDamage = calculation.damage
         val attackToDecimal = amount.toDouble()
 
-        return DamageCalculationResult(
-            damage = baseDamage * (1 + (attackToDecimal / 100)),
-            isCritical = calculation.isCritical
-        )
+        calculation.damage = baseDamage * (1 + (attackToDecimal / 100))
+
+        return calculation
     }
 
     /**
@@ -64,7 +63,7 @@ class SinglePlayerStat(
         val isCriticalDamage = (Random.nextDouble(0.0, 100.0) <= amount.toDouble())
         calculation.isCritical = isCriticalDamage
 
-        return calculation;
+        return calculation
 
     }
 
@@ -74,7 +73,7 @@ class SinglePlayerStat(
             return calculation
         }
 
-        val baseDamage = calculation.damage;
+        val baseDamage = calculation.damage
         val attackToDecimal = amount.toDouble()
 
         calculation.damage = baseDamage * (1 + (attackToDecimal / 100))

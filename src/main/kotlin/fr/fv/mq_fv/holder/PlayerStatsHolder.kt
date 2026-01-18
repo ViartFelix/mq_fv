@@ -3,7 +3,6 @@ package fr.fv.mq_fv.holder
 import fr.fv.mq_fv.dto.DamageCalculationResult
 import fr.fv.mq_fv.exceptions.PlayerStatisticException
 import fr.fv.mq_fv.stats.PlayerStatistic
-import org.bukkit.entity.Entity
 
 /**
  * Will hold player statistics
@@ -12,8 +11,8 @@ class PlayerStatsHolder {
 
     /** Base statistics */
     val stats: List<SinglePlayerStat> = listOf(
-        SinglePlayerStat(100.0f, PlayerStatistic.LIFE),
         SinglePlayerStat(5.0f, PlayerStatistic.DEFENCE),
+        SinglePlayerStat(100.0f, PlayerStatistic.LIFE),
         SinglePlayerStat(10.0f, PlayerStatistic.ATTACK),
         SinglePlayerStat(30.0f, PlayerStatistic.CRITICAL_CHANCE),
         SinglePlayerStat(75.0f, PlayerStatistic.CRITICAL_DAMAGE),
@@ -50,7 +49,7 @@ class PlayerStatsHolder {
 
         this.stats
             .forEach {
-                finalRequest = it.applyDamageModifier(finalRequest)
+                finalRequest = it.applyDefenceModifier(finalRequest)
             }
 
         return damageRequest.damage
@@ -61,7 +60,7 @@ class PlayerStatsHolder {
      */
     private fun getModifiersResult(): DamageCalculationResult
     {
-        var calculatedDamage = DamageCalculationResult(damage = 0.0, isCritical = false)
+        var calculatedDamage = DamageCalculationResult(damage = 1.0, isCritical = false)
 
         // apply modifiers
         this.stats

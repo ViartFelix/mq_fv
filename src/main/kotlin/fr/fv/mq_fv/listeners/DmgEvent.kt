@@ -27,6 +27,9 @@ class DmgEvent(): Listener {
         }
     }
 
+    /**
+     * Handle the damage when the origin of the damage is a player
+     */
     private fun handleWhenDamagerIsPlayer(event: EntityDamageByEntityEvent) {
         val targetDamager = event.damager as Player
 
@@ -43,14 +46,18 @@ class DmgEvent(): Listener {
         } else if( event.entity is LivingEntity ) {
             val targetEntity = event.entity as LivingEntity
 
-            //apply the damage to the target
-            targetEntity.health -= damageCalculationResult.damage
+            if( 0 >= targetEntity.health - damageCalculationResult.damage ) {
+                targetEntity.health = 0.0
+            } else {
+                //apply the damage to the target
+                targetEntity.health -= damageCalculationResult.damage
+            }
         }
 
         this.displayDamageFloatingText(
             damageCalculationResult.damage,
             damageCalculationResult.isCritical,
-            targetDamager.location
+            event.entity.location
         )
     }
 
