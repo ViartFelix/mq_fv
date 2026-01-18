@@ -1,6 +1,7 @@
 package fr.fv.mq_fv.utils
 
 import fr.fv.mq_fv.helpers.ComponentHelper
+import fr.fv.mq_fv.stats.StatStyle
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
@@ -139,5 +140,55 @@ class ComponentFactory {
             .build()
     }
 
+    /**
+     * Returns a component for a statistic
+     */
+    fun buildStatComponent(statNumber: Float, stat: StatStyle): Component
+    {
+        return this.buildStatComponent(statNumber.toString(), stat)
+    }
+
+    /**
+     * Returns a component for a statistic
+     */
+    fun buildStatComponent(statNumber: Int, stat: StatStyle): Component
+    {
+        return this.buildStatComponent(statNumber.toString(), stat)
+    }
+
+    /**
+     * Returns a component for a statistic
+     */
+    fun buildStatComponent(statNumber: String, stat: StatStyle): Component
+    {
+        return Component
+            .text("")
+            .append(Component.text().content(stat.symbol).color(stat.color))
+            .append(Component.text(" "))
+            .append(Component.text().content(statNumber).color(stat.color))
+    }
+
+    /**
+     * Builds the component for the statistics of the player tab
+     */
+    fun buildStatsTabHeader(title: String, dashesLength: Int = 3): Component
+    {
+        // the text component
+        val mainTitleComponent = Component.text("")
+            .append(Component.text().content(title).color(NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true))
+
+        if( 0 >= dashesLength ) {
+            return mainTitleComponent
+        }
+
+        val repeatedDashesComponent = componentHelper.repeatingString(dashesLength, "-")
+
+        return Component.text("")
+            .append(repeatedDashesComponent)
+            .append(Component.text(" "))
+            .append(mainTitleComponent)
+            .append(Component.text(" "))
+            .append(repeatedDashesComponent)
+    }
 
 }

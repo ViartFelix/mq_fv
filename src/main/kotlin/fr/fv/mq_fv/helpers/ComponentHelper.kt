@@ -84,13 +84,18 @@ class ComponentHelper {
      */
     fun repeatingSpaces(length: Int): TextComponent
     {
-        if(length <= 0) throw ComponentHelperException("Length of the repeating spaces is less than 1.")
+        return this.repeatingString(length, " ")
+    }
+
+    fun repeatingString(length: Int, string: String): TextComponent
+    {
+        if(length <= 0) throw ComponentHelperException("Length of the repeating string is less than 1.")
 
         var finalComponent = Component.text("")
 
         for (i in 0 until length) {
             finalComponent = finalComponent.append(
-                Component.text(" ")
+                Component.text(string)
             )
         }
 

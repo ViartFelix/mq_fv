@@ -4,7 +4,9 @@ import com.comphenix.protocol.wrappers.PlayerInfoData
 import com.comphenix.protocol.wrappers.WrappedChatComponent
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.protocolLib.FakePlayerCollectionPacket
+import fr.fv.mq_fv.stats.StatStyle
 import fr.fv.mq_fv.utils.ComponentFactory
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
 import org.bukkit.entity.Player
 
@@ -71,20 +73,27 @@ class TabListHandler {
     }
 
     fun updateRightInfoTab(player: PlayerTable) {
-        val infoColumn = this.getColumn(3)
+        val infoColumn = 3
+        val componentFactory = ComponentFactory()
 
-        //the "money title"
-        val moneyTitleComponent = ComponentFactory().buildTabMoneyTitleComponent("Money")
-        val moneyTitleComponentJson = JSONComponentSerializer.json().serialize(moneyTitleComponent)
-        val monetTitleDisplay = infoColumn.getAtIndex(0)
+        // money
+        this
+            .setComponentToTabList(componentFactory.buildTabMoneyTitleComponent("Money"), infoColumn, 0)
+            .setComponentToTabList(componentFactory.buildTabMoneyComponent(player.money), infoColumn, 1)
 
-        //the true money of the player
-        val moneyComponent = ComponentFactory().buildTabMoneyComponent(player.money)
-        val moneyComponentJson = JSONComponentSerializer.json().serialize(moneyComponent)
-        val moneyDisplay = infoColumn.getAtIndex(1)
+        // the stats of the player
+        this.updateTabPlayerStats()
+    }
 
-        moneyDisplay.displayName = WrappedChatComponent.fromJson(moneyComponentJson)
-        monetTitleDisplay.displayName = WrappedChatComponent.fromJson(moneyTitleComponentJson)
+    private fun updateTabPlayerStats()
+    {
+        val statsColumn = 2
+        val componentFactory = ComponentFactory()
+
+        this
+            .setComponentToTabList(componentFactory.buildStatsTabHeader("Statistics", 5), statsColumn, 0)
+            .setComponentToTabList(componentFactory.buildStatComponent(100, StatStyle.LIFE), statsColumn, 1)
+            .setComponentToTabList(componentFactory.buildStatComponent(5, StatStyle.DEFENCE), statsColumn, 2)
     }
 
     /**
@@ -110,5 +119,17 @@ class TabListHandler {
 
         //mutable -> immutable
         return list.toList()
+    }
+
+    /**
+     * Sets the given component to the tab list in the column and row given.
+     */
+    private fun setComponentToTabList(component: Component, column: Int, row: Int): TabListHandler {
+        val jsonComponent = JSONComponentSerializer.json().serialize(component)
+        val targetTabSlot = this.getColumn(column).getAtIndex(row)
+
+        targetTabSlot.displayName = WrappedChatComponent.fromJson(jsonComponent)
+
+        return this
     }
 }
