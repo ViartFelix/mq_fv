@@ -2,9 +2,10 @@ package fr.fv.mq_fv.tabList
 
 import com.comphenix.protocol.wrappers.PlayerInfoData
 import com.comphenix.protocol.wrappers.WrappedChatComponent
+import fr.fv.mq_fv.holder.PlayerStatsHolder
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.protocolLib.FakePlayerCollectionPacket
-import fr.fv.mq_fv.stats.StatStyle
+import fr.fv.mq_fv.stats.PlayerStatistic
 import fr.fv.mq_fv.utils.ComponentFactory
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
@@ -72,7 +73,7 @@ class TabListHandler {
         return this
     }
 
-    fun updateRightInfoTab(player: PlayerTable) {
+    fun updateRightInfoTab(player: PlayerTable, statistics: PlayerStatsHolder) {
         val infoColumn = 3
         val componentFactory = ComponentFactory()
 
@@ -82,18 +83,33 @@ class TabListHandler {
             .setComponentToTabList(componentFactory.buildTabMoneyComponent(player.money), infoColumn, 1)
 
         // the stats of the player
-        this.updateTabPlayerStats()
+        this.updateTabPlayerStats(statistics)
     }
 
-    private fun updateTabPlayerStats()
+    private fun updateTabPlayerStats(statistics: PlayerStatsHolder)
     {
         val statsColumn = 2
         val componentFactory = ComponentFactory()
 
-        this
-            .setComponentToTabList(componentFactory.buildStatsTabHeader("Statistics", 5), statsColumn, 0)
-            .setComponentToTabList(componentFactory.buildStatComponent(100, StatStyle.LIFE), statsColumn, 1)
-            .setComponentToTabList(componentFactory.buildStatComponent(5, StatStyle.DEFENCE), statsColumn, 2)
+        var currentRowIndex = 0
+
+        // title
+        this.setComponentToTabList(
+            componentFactory.buildStatsTabHeader("Statistics", 5), statsColumn, ++currentRowIndex
+        )
+
+        // the target stats
+        statistics
+            .toMapString()
+            .forEach {
+                if( currentRowIndex <= 19 ) {
+                    this.setComponentToTabList(
+                        componentFactory.buildStatComponent(it.value, it.key),
+                        statsColumn,
+                        ++currentRowIndex
+                    )
+                }
+            }
     }
 
     /**

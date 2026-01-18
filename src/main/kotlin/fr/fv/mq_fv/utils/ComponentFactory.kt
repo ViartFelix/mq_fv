@@ -1,7 +1,7 @@
 package fr.fv.mq_fv.utils
 
 import fr.fv.mq_fv.helpers.ComponentHelper
-import fr.fv.mq_fv.stats.StatStyle
+import fr.fv.mq_fv.stats.PlayerStatistic
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
@@ -143,7 +143,7 @@ class ComponentFactory {
     /**
      * Returns a component for a statistic
      */
-    fun buildStatComponent(statNumber: Float, stat: StatStyle): Component
+    fun buildStatComponent(statNumber: Float, stat: PlayerStatistic): Component
     {
         return this.buildStatComponent(statNumber.toString(), stat)
     }
@@ -151,7 +151,7 @@ class ComponentFactory {
     /**
      * Returns a component for a statistic
      */
-    fun buildStatComponent(statNumber: Int, stat: StatStyle): Component
+    fun buildStatComponent(statNumber: Int, stat: PlayerStatistic): Component
     {
         return this.buildStatComponent(statNumber.toString(), stat)
     }
@@ -159,7 +159,7 @@ class ComponentFactory {
     /**
      * Returns a component for a statistic
      */
-    fun buildStatComponent(statNumber: String, stat: StatStyle): Component
+    fun buildStatComponent(statNumber: String, stat: PlayerStatistic): Component
     {
         return Component
             .text("")

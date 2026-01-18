@@ -2,14 +2,19 @@ package fr.fv.mq_fv.handlers
 
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
+import fr.fv.mq_fv.dto.DamageCalculationResult
 import fr.fv.mq_fv.exceptions.DatabaseException
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.repositories.PlayerRepository
 import fr.fv.mq_fv.helpers.PotionEffectsHelper
+import fr.fv.mq_fv.holder.PlayerStatsHolder
+import fr.fv.mq_fv.stats.PlayerStatistic
 import fr.fv.mq_fv.tabList.TabListHandler
 import fr.fv.mq_fv.utils.ComponentFactory
 import fr.fv.mq_fv.utils.ConfigurationsHolder
+import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 
 /**
  * Class to handle the player's actions and other things
@@ -41,6 +46,8 @@ class PlayerHandler (
     /** Tab list manager for that player */
     val tabList: TabListHandler = TabListHandler()
 
+    val playerStats: PlayerStatsHolder = PlayerStatsHolder()
+
     init {
         //fetch the player
         val fetchedPlayer = playerRepository.getPlayer(this.mcPlayer)
@@ -51,7 +58,7 @@ class PlayerHandler (
         this.applyPotionEffects()
 
         this.tabList.initTabList()
-        this.tabList.updateRightInfoTab(this.playerEntity)
+        this.tabList.updateRightInfoTab(this.playerEntity, this.playerStats)
         this.tabList.sendAllPackets(this.mcPlayer)
     }
 
@@ -79,7 +86,22 @@ class PlayerHandler (
             componentFactory.buildPlayerTabHeader(this.mcPlayer, configServerName)
         )
 
-        this.tabList.updateRightInfoTab(this.playerEntity)
+        this.tabList.updateRightInfoTab(this.playerEntity, this.playerStats)
         this.tabList.sendAllPackets(this.mcPlayer)
+    }
+
+    /**
+     * Calculates the damage reduction on this player from another player and applies said damage
+     */
+    fun requestDamageToThisPlayer(damage: DamageCalculationResult)
+    {
+        val finalDamageCalculation = playerStats.calculateDamageReduction(damage)
+
+        val targetHealth = playerStats.getTargetStat( PlayerStatistic.LIFE )
+
+        if( 0 >= targetHealth.amount - finalDamageCalculation.toFloat() ) {
+            mcPlayer.health = 0.0
+            mcPlayer.damage(0.1)
+        }
     }
 }
