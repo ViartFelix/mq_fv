@@ -47,8 +47,13 @@ class DmgEvent(): Listener {
             val targetPlayerDamagee = event.entity as Player
             val targetDamageePlayerHandler = playerHandlerInstance.getPlayerHandler(targetPlayerDamagee)!!
 
+            if( !targetDamageePlayerHandler.isPlayerHittable() ) {
+                return
+            }
+
             targetDamageePlayerHandler.requestDamageToThisPlayer(damageCalculationResult)
             this.applyKnockBackToDamagee(targetPlayerDamagee, targetDamager)
+            targetDamageePlayerHandler.markPlayerAsHit()
         }
         // player -> mob
         else if( event.entity is LivingEntity ) {
@@ -84,6 +89,10 @@ class DmgEvent(): Listener {
             val targetPlayerDamagee = event.entity as Player
             val targetDamageePlayerHandler = AllPlayersHandlerHolder.instance.getPlayerHandler(targetPlayerDamagee)!!
 
+            if( !targetDamageePlayerHandler.isPlayerHittable() ) {
+                return
+            }
+
             val calculationRequest = DamageCalculationResult(
                 damage = event.damage,
                 isCritical = event.isCritical
@@ -92,6 +101,7 @@ class DmgEvent(): Listener {
             targetDamageePlayerHandler.requestDamageToThisPlayer(calculationRequest)
             this.displayDamageFloatingText(calculationRequest.damage, calculationRequest.isCritical, damagee.location)
             this.applyKnockBackToDamagee(targetPlayerDamagee, targetDamager)
+            targetDamageePlayerHandler.markPlayerAsHit()
         }
         // mob -> mob
         else if( damagee is LivingEntity ) {

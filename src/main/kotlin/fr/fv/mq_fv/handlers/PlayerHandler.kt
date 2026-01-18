@@ -13,6 +13,9 @@ import fr.fv.mq_fv.tabList.TabListHandler
 import fr.fv.mq_fv.utils.ComponentFactory
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import org.bukkit.entity.Player
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 
 /**
  * Class to handle the player's actions and other things
@@ -46,6 +49,13 @@ class PlayerHandler (
 
     /** Holds the statistics of the current player */
     val playerStats: PlayerStatsHolder = PlayerStatsHolder()
+
+    /** Holds the last hit (to prevent spam attack) */
+    var lastHit: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
+        private set
+
+    /** Time between hits */
+    val timeBetweenHits: Duration = 0.5.seconds;
 
     init {
         //fetch the player
@@ -103,4 +113,17 @@ class PlayerHandler (
             mcPlayer.health = 0.0
         }
     }
+
+    /**
+     * Marks player as hit for now
+     */
+    fun markPlayerAsHit()
+    {
+        lastHit = TimeSource.Monotonic.markNow()
+    }
+
+    /**
+     * Can this player be hit again ?
+     */
+    fun isPlayerHittable(): Boolean = lastHit.elapsedNow() >= timeBetweenHits
 }
