@@ -22,12 +22,12 @@ class PlayerStatsHolder {
     /**
      * Returns an ordered list for the modifiers application
      */
-    fun getModifiersOrder(): List<SinglePlayerStat> = stats.sortedBy { it.stat.modifierIndex }
+    fun getModifiersOrder(): List<SinglePlayerStat> = stats.toList().sortedBy { it.stat.modifierIndex }
 
     /**
      * Returns an ordered list for the tab list
      */
-    fun getTabListOrder(): List<SinglePlayerStat> = stats.sortedBy { it.stat.displayIndex }
+    fun getTabListOrder(): List<SinglePlayerStat> = stats.toList().sortedBy { it.stat.displayIndex }
 
     /**
      * Returns a map containing the stat and the string representation of said stat
@@ -46,6 +46,16 @@ class PlayerStatsHolder {
     }
 
     /**
+     * Returns a pair containing the stat and the string representation of said stat
+     */
+    fun toPairString(list: List<SinglePlayerStat>): List<Pair<PlayerStatistic, String>>
+    {
+        return list.map {
+            Pair(it.stat, it.amountToString())
+        }
+    }
+
+    /**
      * Calculates the damage
      */
     fun calculateDamage(): DamageCalculationResult {
@@ -59,12 +69,7 @@ class PlayerStatsHolder {
     {
         var finalRequest = damageRequest.copy()
 
-        val modif = getModifiersOrder()
-
-        //println("damage reduction for calculation")
-        //println(modif)
-
-        modif.forEach {
+        getModifiersOrder().forEach {
             finalRequest = it.applyDefenceModifier(finalRequest)
         }
 
@@ -78,13 +83,8 @@ class PlayerStatsHolder {
     {
         var calculatedDamage = DamageCalculationResult(damage = 1.0, isCritical = false)
 
-        val modif = getModifiersOrder()
-
-        //println("attack modifiers")
-        //println(modif)
-
         // apply modifiers
-        modif.forEach {
+        getModifiersOrder().forEach {
             calculatedDamage = it.applyDamageModifier(calculatedDamage)
         }
 

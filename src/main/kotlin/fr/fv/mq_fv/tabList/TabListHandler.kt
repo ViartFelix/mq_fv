@@ -99,11 +99,11 @@ class TabListHandler {
 
         // the target stats
         statistics
-            .toMapString(statistics.getTabListOrder())
+            .toPairString(statistics.getTabListOrder())
             .forEach {
                 if( currentRowIndex <= 19 ) {
                     this.setComponentToTabList(
-                        componentFactory.buildStatComponent(it.value, it.key),
+                        componentFactory.buildStatComponent(it.second, it.first),
                         statsColumn,
                         ++currentRowIndex
                     )
