@@ -39,7 +39,7 @@ class DmgEvent(): Listener {
         val playerHandlerInstance = AllPlayersHandlerHolder.instance
         val targetPlayerHandler = playerHandlerInstance.getPlayerHandler(targetDamager)!!
 
-        val damageCalculationResult = targetPlayerHandler.playerStats.calculateDamage()
+        val damageCalculationResult = targetPlayerHandler.playerStats.calculateDamageToInflict()
 
         // player -> player
         if( EntityType.PLAYER == event.entity.type ) {

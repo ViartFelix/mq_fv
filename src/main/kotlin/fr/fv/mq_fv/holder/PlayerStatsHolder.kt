@@ -3,6 +3,7 @@ package fr.fv.mq_fv.holder
 import fr.fv.mq_fv.dto.DamageCalculationResult
 import fr.fv.mq_fv.exceptions.PlayerStatisticException
 import fr.fv.mq_fv.stats.PlayerStatistic
+import fr.fv.mq_fv.stats.PlayerStatisticType
 
 /**
  * Will hold player statistics
@@ -10,7 +11,7 @@ import fr.fv.mq_fv.stats.PlayerStatistic
 class PlayerStatsHolder {
 
     /** Base statistics */
-    val stats: List<SinglePlayerStat> = listOf(
+    private val stats: List<SinglePlayerStat> = listOf(
         SinglePlayerStat(100.0f, PlayerStatistic.LIFE),
         SinglePlayerStat(5.0f, PlayerStatistic.DEFENCE),
 
@@ -20,26 +21,29 @@ class PlayerStatsHolder {
     )
 
     /**
-     * Returns an ordered list for the modifiers application
+     * Returns the modifiers with this type and sorts the results by their modifiers index
      */
-    fun getModifiersOrder(): List<SinglePlayerStat> = stats.toList().sortedBy { it.stat.modifierIndex }
+    fun getModifiersByType(type: PlayerStatisticType): List<SinglePlayerStat> =
+        stats
+            .filter { type === it.stat.modifierType }
+            .sortedBy { it.stat.modifierIndex }
 
     /**
      * Returns an ordered list for the tab list
      */
-    fun getTabListOrder(): List<SinglePlayerStat> = stats.toList().sortedBy { it.stat.displayIndex }
+    fun getTabListOrder(): List<SinglePlayerStat> =
+        stats
+            .sortedBy { it.stat.displayIndex }
 
     /**
      * Returns a map containing the stat and the string representation of said stat
      */
     fun toMapString(list: List<SinglePlayerStat>): Map<PlayerStatistic, String>
     {
-        //println("to map string for the tab list")
-        //println(list)
         val targetMap = HashMap<PlayerStatistic, String>()
 
         list.forEach {
-            targetMap[it.stat] = it.amountToString()
+            targetMap[it.stat] = it.stat.getStringRepresentation(it.amount.toDouble())
         }
 
         return targetMap
@@ -48,19 +52,10 @@ class PlayerStatsHolder {
     /**
      * Returns a pair containing the stat and the string representation of said stat
      */
-    fun toPairString(list: List<SinglePlayerStat>): List<Pair<PlayerStatistic, String>>
-    {
-        return list.map {
-            Pair(it.stat, it.amountToString())
+    fun toPairString(list: List<SinglePlayerStat>): List<Pair<PlayerStatistic, String>> =
+        list.map {
+            Pair(it.stat, it.stat.getStringRepresentation(it.amount.toDouble()))
         }
-    }
-
-    /**
-     * Calculates the damage
-     */
-    fun calculateDamage(): DamageCalculationResult {
-        return this.getModifiersResult()
-    }
 
     /**
      * Calculates the damage to receive to this player from another player
@@ -69,24 +64,25 @@ class PlayerStatsHolder {
     {
         var finalRequest = damageRequest.copy()
 
-        getModifiersOrder().forEach {
-            finalRequest = it.applyDefenceModifier(finalRequest)
-        }
+        getModifiersByType(PlayerStatisticType.DEFENCIVE)
+            .forEach {
+                finalRequest = it.stat.applyModifier(it.amount.toDouble(), finalRequest)
+            }
 
         return damageRequest.damage
     }
 
     /**
-     * Applies the modifiers of statistics
+     * Calculate the damage to give
      */
-    private fun getModifiersResult(): DamageCalculationResult
+    fun calculateDamageToInflict(): DamageCalculationResult
     {
         var calculatedDamage = DamageCalculationResult(damage = 1.0, isCritical = false)
 
-        // apply modifiers
-        getModifiersOrder().forEach {
-            calculatedDamage = it.applyDamageModifier(calculatedDamage)
-        }
+        getModifiersByType(PlayerStatisticType.OFFENSIVE)
+            .forEach {
+                calculatedDamage = it.stat.applyModifier(it.amount.toDouble(), calculatedDamage)
+            }
 
         return calculatedDamage
     }

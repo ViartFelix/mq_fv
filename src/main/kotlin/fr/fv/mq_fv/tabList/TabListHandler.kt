@@ -105,7 +105,7 @@ class TabListHandler {
                     this.setComponentToTabList(
                         componentFactory.buildStatComponent(it.second, it.first),
                         statsColumn,
-                        ++currentRowIndex
+                        currentRowIndex++
                     )
                 }
             }
