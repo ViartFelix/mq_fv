@@ -191,4 +191,14 @@ class ComponentFactory {
             .append(repeatedDashesComponent)
     }
 
+    fun buildPlayerCurrentHpComponent(hp: Double): Component
+    {
+        val lifeStat = PlayerStatistic.LIFE
+
+        return Component
+            .text("")
+            .append(Component.text(lifeStat.symbol).color(lifeStat.color))
+            .append(Component.text(" "))
+            .append(Component.text(lifeStat.getStringRepresentation(hp)).color(lifeStat.color))
+    }
 }

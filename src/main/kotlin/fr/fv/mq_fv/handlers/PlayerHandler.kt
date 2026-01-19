@@ -7,6 +7,7 @@ import fr.fv.mq_fv.exceptions.DatabaseException
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.repositories.PlayerRepository
 import fr.fv.mq_fv.helpers.PotionEffectsHelper
+import fr.fv.mq_fv.holder.PlayerNametagHolder
 import fr.fv.mq_fv.holder.PlayerStatsHolder
 import fr.fv.mq_fv.tabList.TabListHandler
 import fr.fv.mq_fv.utils.ComponentFactory
@@ -56,6 +57,9 @@ class PlayerHandler (
     /** Time between hits */
     val timeBetweenHits: Duration = 0.5.seconds
 
+    /** The nametag handler for this player */
+    val nametagHolder: PlayerNametagHolder = PlayerNametagHolder()
+
     init {
         //fetch the player
         val fetchedPlayer = playerRepository.getPlayer(this.mcPlayer)
@@ -68,6 +72,9 @@ class PlayerHandler (
         this.tabList.initTabList()
         this.tabList.updateRightInfoTab(this.playerEntity, this.playerStats)
         this.tabList.sendAllPackets(this.mcPlayer)
+
+        this.nametagHolder.initNametagsForPlayer(this.mcPlayer)
+        this.nametagHolder.updateNametags(this.mcPlayer, this.playerStats.currentHp)
     }
 
     /**
