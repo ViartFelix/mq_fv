@@ -18,6 +18,9 @@ repositories {
         name = "sonatype"
     }
     maven("https://repo.dmulloy2.net/repository/public/")
+    maven("https://repo.opencollab.dev/main/") {
+        name = "opencollab"
+    }
 }
 
 val ktormVersion = "4.1.1"
@@ -25,6 +28,7 @@ val postgresqlAdapterVersion = "42.7.4"
 val protocolLibVersion = "5.3.0"
 val boostedYamlVersion = "1.3.6"
 val mcVersion = "1.20.6"
+val mcProtocolVersion = "1.21.11-SNAPSHOT"
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:${mcVersion}-R0.1-SNAPSHOT")
@@ -45,6 +49,9 @@ dependencies {
     //protocolLib
     //implementation("com.comphenix.protocol:ProtocolLib:${protocolLibVersion}")
     compileOnly("com.comphenix.protocol:ProtocolLib:${protocolLibVersion}")
+
+    //mc protocolLib
+    implementation("org.geysermc.mcprotocollib:protocol:${mcProtocolVersion}")
 }
 
 val targetJavaVersion = 21
