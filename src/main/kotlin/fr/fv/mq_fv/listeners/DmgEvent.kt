@@ -3,6 +3,7 @@ package fr.fv.mq_fv.listeners
 import fr.fv.mq_fv.Mq_fv
 import fr.fv.mq_fv.dto.DamageCalculationResult
 import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
+import fr.fv.mq_fv.protocolLib.FakeHurtAnimation
 import fr.fv.mq_fv.utils.FloatingText
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -52,6 +53,7 @@ class DmgEvent(): Listener {
             }
 
             targetDamageePlayerHandler.requestDamageToThisPlayer(damageCalculationResult)
+            this.requestHurtAnimationToDamagee(targetPlayerDamagee)
             this.applyKnockBackToDamagee(targetPlayerDamagee, targetDamager)
             targetDamageePlayerHandler.markPlayerAsHit()
         }
@@ -64,6 +66,7 @@ class DmgEvent(): Listener {
             } else {
                 //apply the damage to the target
                 targetEntity.health -= damageCalculationResult.damage
+                this.requestHurtAnimationToDamagee(targetEntity)
                 this.applyKnockBackToDamagee(targetEntity, targetDamager)
             }
         }
@@ -101,6 +104,7 @@ class DmgEvent(): Listener {
             targetDamageePlayerHandler.requestDamageToThisPlayer(calculationRequest)
             this.displayDamageFloatingText(calculationRequest.damage, calculationRequest.isCritical, damagee.location)
             this.applyKnockBackToDamagee(targetPlayerDamagee, targetDamager)
+            this.requestHurtAnimationToDamagee(targetPlayerDamagee)
             targetDamageePlayerHandler.markPlayerAsHit()
         }
         // mob -> mob
@@ -113,9 +117,8 @@ class DmgEvent(): Listener {
             } else {
                 damagee.health -= event.damage
                 this.applyKnockBackToDamagee(damagee, targetDamager)
+                this.requestHurtAnimationToDamagee(damagee)
             }
-
-            this.applyKnockBackToDamagee(damagee, targetDamager)
         }
     }
 
@@ -158,6 +161,19 @@ class DmgEvent(): Listener {
         direction.y = yBoost
 
         target.velocity = direction.multiply(strength)
+    }
+
+    /**
+     * Sends a packet to play the animation where an entity is hurt (turns red)
+     */
+    private fun requestHurtAnimationToDamagee(target: LivingEntity) {
+        val animation = FakeHurtAnimation(target, 0.0f)
+        animation.buildPacket()
+
+        Bukkit.getOnlinePlayers()
+            .forEach {
+                animation.sendPacket(it)
+            }
     }
 
     private fun getPrependIcon(isCritical: Boolean): Char = if(isCritical)
