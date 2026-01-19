@@ -84,3 +84,25 @@ tasks {
         }
     }
 }
+
+tasks.register("buildRestart") {
+    dependsOn("shadowJar")
+
+    doLast {
+        println("Restarting the docker container...")
+
+        val process = ProcessBuilder("docker", "compose", "up", "--build", "-d")
+            .inheritIO()
+            .start()
+
+        process.waitFor()
+
+        val code = process.exitValue()
+
+        if( 0 != code ) {
+            error("The docker restart failed with exit code $code")
+        } else {
+            println("The docker container was successfully restarted !")
+        }
+    }
+}
