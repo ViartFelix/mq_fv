@@ -22,13 +22,19 @@ class PlayerNametagHolder {
             currentHp = 100.0,
             location = calculateLocationForHpText(player)
         )
+
+        player.passengers.add(0, hpTextDisplay)
     }
 
-    fun updateNametags(player: Player, currentHp: Double)
+    fun updateNametags(currentHp: Double)
     {
-        hpTextDisplay.teleport(calculateLocationForHpText(player))
         hpTextDisplay.text(ComponentFactory().buildPlayerCurrentHpComponent(currentHp))
     }
 
     private fun calculateLocationForHpText(player: Player): Location = player.location.add(0.0, 2.0, 0.0)
+
+    fun removeNametagsFromPlayer()
+    {
+        this.hpTextDisplay.remove()
+    }
 }

@@ -46,8 +46,10 @@ private constructor() {
      */
     fun removePlayerHandler(mcPlayer: Player)
     {
-        if( this.hasPlayerHandler(mcPlayer) ) {
-            val foundPlayerHandler = this.getPlayerHandler(mcPlayer)
+        val foundPlayerHandler = this.getPlayerHandler(mcPlayer)
+
+        if( null != foundPlayerHandler ) {
+            foundPlayerHandler.onPlayerDisconnect()
             this.allHandlers.remove(foundPlayerHandler)
         }
     }

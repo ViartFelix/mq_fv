@@ -74,7 +74,7 @@ class PlayerHandler (
         this.tabList.sendAllPackets(this.mcPlayer)
 
         this.nametagHolder.initNametagsForPlayer(this.mcPlayer)
-        this.nametagHolder.updateNametags(this.mcPlayer, this.playerStats.currentHp)
+        this.nametagHolder.updateNametags(this.playerStats.currentHp)
     }
 
     /**
@@ -132,4 +132,12 @@ class PlayerHandler (
      * Can this player be hit again ?
      */
     fun isPlayerHittable(): Boolean = lastHit.elapsedNow() >= timeBetweenHits
+
+    /**
+     * Handles when the player disconnects
+     */
+    fun onPlayerDisconnect()
+    {
+        this.nametagHolder.removeNametagsFromPlayer()
+    }
 }

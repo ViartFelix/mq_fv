@@ -11,7 +11,7 @@ class PlayerDisplayTextRunnable : BukkitRunnable() {
         val allPlayerHandlers = AllPlayersHandlerHolder.instance.allHandlers
 
         allPlayerHandlers.forEach {
-            it.nametagHolder.updateNametags(it.mcPlayer, it.playerStats.currentHp)
+            it.nametagHolder.updateNametags(it.playerStats.currentHp)
         }
     }
 }
