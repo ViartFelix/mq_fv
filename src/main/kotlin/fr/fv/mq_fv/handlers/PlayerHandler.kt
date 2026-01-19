@@ -8,7 +8,6 @@ import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.repositories.PlayerRepository
 import fr.fv.mq_fv.helpers.PotionEffectsHelper
 import fr.fv.mq_fv.holder.PlayerStatsHolder
-import fr.fv.mq_fv.stats.PlayerStatistic
 import fr.fv.mq_fv.tabList.TabListHandler
 import fr.fv.mq_fv.utils.ComponentFactory
 import fr.fv.mq_fv.utils.ConfigurationsHolder
@@ -55,7 +54,7 @@ class PlayerHandler (
         private set
 
     /** Time between hits */
-    val timeBetweenHits: Duration = 0.5.seconds;
+    val timeBetweenHits: Duration = 0.5.seconds
 
     init {
         //fetch the player
@@ -106,9 +105,9 @@ class PlayerHandler (
     {
         val finalDamageCalculation = playerStats.calculateDamageReduction(damage)
 
-        val targetHealth = playerStats.getTargetStat( PlayerStatistic.LIFE )
+        val isPlayerDead = playerStats.removeHealth(finalDamageCalculation)
 
-        if( 0 >= targetHealth.amount - finalDamageCalculation.toFloat() ) {
+        if( isPlayerDead ) {
             mcPlayer.damage(0.0)
             mcPlayer.health = 0.0
         }

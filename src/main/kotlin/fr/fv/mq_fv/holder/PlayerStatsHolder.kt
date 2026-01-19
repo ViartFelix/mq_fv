@@ -20,6 +20,9 @@ class PlayerStatsHolder {
         SinglePlayerStat(75.0f, PlayerStatistic.CRITICAL_DAMAGE),
     )
 
+    var currentHp: Double = 100.0
+        private set
+
     /**
      * Returns the modifiers with this type and sorts the results by their modifiers index
      */
@@ -92,4 +95,39 @@ class PlayerStatsHolder {
     fun getTargetStat(stat: PlayerStatistic): SinglePlayerStat =
         this.getSafeTargetStat(stat) ?:
             throw PlayerStatisticException("Player statistic '${stat.name}' is not found in the holder.")
+
+    /**
+     * Adds health to this player
+     */
+    fun addHealth(health: Double)
+    {
+        val maxHpStat = getTargetStat(PlayerStatistic.LIFE)
+
+        if( 0 >= health ) {
+            return
+        }
+
+        if( maxHpStat.amount <= currentHp + health ) {
+            currentHp = maxHpStat.amount.toDouble()
+        } else {
+            currentHp += currentHp + health
+        }
+    }
+
+    /**
+     * Removes health from the player.
+     * Returns true if the player is dead from this HP removal
+     */
+    fun removeHealth(health: Double): Boolean
+    {
+        if( 0 < health ) {
+            if( 0 >= currentHp - health ) {
+                currentHp = 0.0
+            } else {
+                currentHp -= health
+            }
+        }
+
+        return 0 >= currentHp
+    }
 }
