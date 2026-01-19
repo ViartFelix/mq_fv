@@ -12,9 +12,6 @@ class FakeHurtAnimation(
     private val yaw: Float,
 ): BuildablePacket, AbstractPacket(PacketType.Play.Server.HURT_ANIMATION) {
     override fun buildPacket() {
-        println("qzdzdqqzqdzdqzdq")
-        println(target)
-
         packet.integers.write(0, target.entityId)
         packet.float.write(0, yaw)
     }

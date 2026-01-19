@@ -2,10 +2,7 @@ package fr.fv.mq_fv
 
 import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
 import fr.fv.mq_fv.interfaces.EventsRegisterer
-import fr.fv.mq_fv.listeners.DmgEvent
-import fr.fv.mq_fv.listeners.OnPlayerDisconnect
-import fr.fv.mq_fv.listeners.OnPlayerJoin
-import fr.fv.mq_fv.listeners.OnTabRefreshRequest
+import fr.fv.mq_fv.listeners.*
 import fr.fv.mq_fv.runnable.TabRefreshRunnable
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import fr.fv.mq_fv.utils.DatabaseWrapper
@@ -41,6 +38,9 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
         server.pluginManager.registerEvents(OnPlayerJoin(), this)
         server.pluginManager.registerEvents(OnTabRefreshRequest(), this)
         server.pluginManager.registerEvents(OnPlayerDisconnect(), this)
+
+        // packets listener
+        MainPacketListener.instance.registerAllPacketListeners()
     }
 
     /**
