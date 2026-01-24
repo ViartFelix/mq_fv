@@ -201,4 +201,14 @@ class ComponentFactory {
             .append(Component.text(" "))
             .append(Component.text(lifeStat.getStringRepresentation(hp)).color(lifeStat.color))
     }
+
+    /**
+     * Builds the component with the given symbol
+     */
+    fun buildStatSymbolComponent(stat: PlayerStatistic): Component
+    {
+        return Component
+            .text(" ")
+            .append(Component.text(stat.symbol).color(stat.color))
+    }
 }

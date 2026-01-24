@@ -1,13 +1,10 @@
 package fr.fv.mq_fv.handlers
 
-import com.comphenix.protocol.ProtocolLibrary
-import com.comphenix.protocol.ProtocolManager
 import fr.fv.mq_fv.dto.DamageCalculationResult
 import fr.fv.mq_fv.exceptions.DatabaseException
 import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.repositories.PlayerRepository
 import fr.fv.mq_fv.helpers.PotionEffectsHelper
-import fr.fv.mq_fv.holder.PlayerNametagHolder
 import fr.fv.mq_fv.holder.PlayerStatsHolder
 import fr.fv.mq_fv.tabList.TabListHandler
 import fr.fv.mq_fv.utils.ComponentFactory
@@ -21,60 +18,51 @@ import kotlin.time.TimeSource
  * Class to handle the player's actions and other things
  */
 class PlayerHandler (
-    mcPlayer: Player
+    val mcPlayer: Player
 ) {
-    /** Minecraft's Player instance */
-    var mcPlayer: Player = mcPlayer
-        private set
-
-    /** Player entity of the DB */
-    var playerEntity: PlayerTable
-        private set
-
-    /** Player DB repository */
-    var playerRepository: PlayerRepository = PlayerRepository()
-        private set
-
-    /** Potion effect factory */
-    val potionEffectsHelper: PotionEffectsHelper = PotionEffectsHelper()
-
-    /** Component factory */
-    val componentFactory: ComponentFactory = ComponentFactory()
-
-    /** ProtocolLib manager */
-    val manager: ProtocolManager = ProtocolLibrary.getProtocolManager()
-
-    /** Tab list manager for that player */
-    val tabList: TabListHandler = TabListHandler()
+    /** Holds the last hit (to prevent spam attack) */
+    private var lastHit: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
 
     /** Holds the statistics of the current player */
     val playerStats: PlayerStatsHolder = PlayerStatsHolder()
 
-    /** Holds the last hit (to prevent spam attack) */
-    var lastHit: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
-        private set
+    companion object {
+        /** Player entity of the DB */
+        lateinit var playerEntity: PlayerTable
+            private set
 
-    /** Time between hits */
-    val timeBetweenHits: Duration = 0.5.seconds
+        /** Player DB repository */
+        val playerRepository: PlayerRepository = PlayerRepository()
 
-    /** The nametag handler for this player */
-    val nametagHolder: PlayerNametagHolder = PlayerNametagHolder()
+        /** Potion effect factory */
+        val potionEffectsHelper: PotionEffectsHelper = PotionEffectsHelper()
+
+        /** Tab list manager for that player */
+        val tabList: TabListHandler = TabListHandler()
+
+        /** Time between hits */
+        val timeBetweenHits: Duration = 0.5.seconds
+
+        val scoreboardManager: PlayerScoreboardManager = PlayerScoreboardManager.instance
+    }
 
     init {
+        PlayerScoreboardManager.instance.initHealthObjective()
+
         //fetch the player
-        val fetchedPlayer = playerRepository.getPlayer(this.mcPlayer)
+        val fetchedPlayer = playerRepository.getPlayer(mcPlayer)
             ?: throw DatabaseException("Player '${mcPlayer.name}' (uuid: ${mcPlayer.uniqueId}) trying to be fetched from the DB is not registered")
 
-        this.playerEntity = fetchedPlayer
+        playerEntity = fetchedPlayer
 
         this.applyPotionEffects()
 
-        this.tabList.initTabList()
-        this.tabList.updateRightInfoTab(this.playerEntity, this.playerStats)
-        this.tabList.sendAllPackets(this.mcPlayer)
+        tabList.initTabList()
+        tabList.updateRightInfoTab(playerEntity, playerStats)
+        tabList.sendAllPackets(mcPlayer)
 
-        this.nametagHolder.initNametagsForPlayer(this.mcPlayer)
-        this.nametagHolder.updateNametags(this.playerStats.currentHp)
+        scoreboardManager.addPlayerToHealthDisplayScore(mcPlayer)
+        scoreboardManager.setHealthDisplayScoreForPlayer(mcPlayer, playerStats.currentHp)
     }
 
     /**
@@ -82,9 +70,7 @@ class PlayerHandler (
      */
     private fun applyPotionEffects()
     {
-        val player = this.mcPlayer
-
-        player.addPotionEffect(potionEffectsHelper.getInfiniteNightVision())
+        mcPlayer.addPotionEffect(potionEffectsHelper.getInfiniteNightVision())
     }
 
     /**
@@ -98,11 +84,11 @@ class PlayerHandler (
 
         //header
         mcPlayer.sendPlayerListHeader(
-            componentFactory.buildPlayerTabHeader(this.mcPlayer, configServerName)
+            ComponentFactory().buildPlayerTabHeader(mcPlayer, configServerName)
         )
 
-        this.tabList.updateRightInfoTab(this.playerEntity, this.playerStats)
-        this.tabList.sendAllPackets(this.mcPlayer)
+        tabList.updateRightInfoTab(playerEntity, playerStats)
+        tabList.sendAllPackets(mcPlayer)
     }
 
     /**
@@ -113,6 +99,8 @@ class PlayerHandler (
         val finalDamageCalculation = playerStats.calculateDamageReduction(damage)
 
         val isPlayerDead = playerStats.removeHealth(finalDamageCalculation)
+
+        updateDisplayedHealth(playerStats.currentHp)
 
         if( isPlayerDead ) {
             mcPlayer.damage(0.0)
@@ -138,6 +126,14 @@ class PlayerHandler (
      */
     fun onPlayerDisconnect()
     {
-        this.nametagHolder.removeNametagsFromPlayer()
+        //
+    }
+
+    /**
+     * Updates the displayed health on this player
+     */
+    private fun updateDisplayedHealth(health: Double)
+    {
+        scoreboardManager.setHealthDisplayScoreForPlayer(mcPlayer, health)
     }
 }
