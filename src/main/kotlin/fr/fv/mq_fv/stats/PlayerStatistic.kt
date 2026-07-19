@@ -3,6 +3,7 @@ package fr.fv.mq_fv.stats
 import fr.fv.mq_fv.dto.DamageCalculationResult
 import fr.fv.mq_fv.interfaces.ModifierApplicant
 import net.kyori.adventure.text.format.TextColor
+import kotlin.math.floor
 import kotlin.random.Random
 
 /**
@@ -105,6 +106,19 @@ enum class PlayerStatistic(
             val rawStringRepresentation = super.getStringRepresentation(amount)
 
             return "$rawStringRepresentation %"
+        }
+    },
+
+    JUMPS(
+        symbol = "\uD83E\uDEB6",
+        color = TextColor.color(29, 229, 33),
+        displayIndex = 6,
+        modifierType = PlayerStatisticType.NONE,
+        decimalAmount = 0,
+        modifierIndex = 0,
+    ) {
+        override fun getStringRepresentation(amount: Double): String {
+            return "%.0f".format(floor(amount))
         }
     };
 
