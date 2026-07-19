@@ -33,6 +33,7 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
         this.initDbConnection()
         this.bukkitEventListeners = listOf(
             DmgEvent(),
+            OnEnvironmentalDamage(),
             OnPlayerJoin(),
             OnTabRefreshRequest(),
             OnPlayerDisconnect(),
