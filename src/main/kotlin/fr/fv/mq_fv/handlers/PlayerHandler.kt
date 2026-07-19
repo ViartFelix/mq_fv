@@ -172,16 +172,10 @@ class PlayerHandler (
         updatePlayerDisplayedInfos()
     }
 
-    fun handleWhenPlayerRespawn()
-    {
-        markPlayerAsHit()
-        updatePlayerDisplayedInfos()
-    }
-
     /**
      * Updates what the player can see in the world (nametags, tablist, etc.).
      */
-    private fun updatePlayerDisplayedInfos()
+    fun updatePlayerDisplayedInfos()
     {
         applyPotionEffects()
         updatePlayerTab()
@@ -190,5 +184,14 @@ class PlayerHandler (
         tabList.sendAllPackets(mcPlayer)
 
         updateDisplayedHealth(playerStats.currentHp)
+        updatePlayerHealthBar()
+
+        // update the action bar
+        mcPlayer.sendActionBar(
+            ComponentFactory().buildActionBarInfos(
+                this.playerStats.currentHp,
+                this.playerStats.getTargetStat(PlayerStatistic.LIFE).amount.toDouble()
+            )
+        )
     }
 }

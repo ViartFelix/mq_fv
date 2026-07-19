@@ -10,6 +10,7 @@ import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.Listener
+import org.bukkit.util.Vector
 import kotlin.math.roundToInt
 
 /**
@@ -50,9 +51,15 @@ abstract class AbstractDamageHandler : Listener {
     protected fun applyKnockBackToDamagee(
         target: LivingEntity, originLocation: Location, strength: Double = 0.4, yBoost: Double = 0.75
     ) {
-        val direction = target.location.toVector()
-            .subtract(originLocation.toVector())
-            .normalize()
+        val delta = target.location.toVector().subtract(originLocation.toVector())
+
+        // target and origin can share the exact same coordinates (e.g. melee mob overlapping
+        // the player's hitbox), which would normalize a zero-length vector into NaNs
+        val direction = if (delta.lengthSquared() == 0.0) {
+            Vector(1.0, 0.0, 0.0)
+        } else {
+            delta.normalize()
+        }
 
         direction.y = yBoost
 

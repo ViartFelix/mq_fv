@@ -4,6 +4,7 @@ import fr.fv.mq_fv.commands.DamageCommand
 import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
 import fr.fv.mq_fv.interfaces.EventsRegisterer
 import fr.fv.mq_fv.listeners.*
+import fr.fv.mq_fv.runnable.PlayerSeeableInfosRunnable
 import fr.fv.mq_fv.runnable.TabRefreshRunnable
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import fr.fv.mq_fv.utils.DatabaseWrapper
@@ -122,5 +123,6 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
 
         //tab refresh
         TabRefreshRunnable().runTaskTimer(this, configDelay.toLong(), configRefreshInterval.toLong())
+        PlayerSeeableInfosRunnable().runTaskTimer(this, 10, 10)
     }
 }

@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import java.math.BigDecimal
+import kotlin.math.roundToInt
 import org.bukkit.entity.Player as mcPlayer
 
 class ComponentFactory {
@@ -210,5 +211,20 @@ class ComponentFactory {
         return Component
             .text(" ")
             .append(Component.text(stat.symbol).color(stat.color))
+    }
+
+    /**
+     * Builds the component for the action bar of the player
+     */
+    fun buildActionBarInfos(
+        currentHealth: Double, maxHealth: Double, displayedAs: PlayerStatistic = PlayerStatistic.LIFE
+    ): Component {
+        return Component
+            .text("")
+            .append(Component.text(displayedAs.symbol).color(displayedAs.color))
+            .append(Component.text(" "))
+            .append(Component.text(currentHealth.roundToInt()).color(displayedAs.color))
+            .append(Component.text("/").color(displayedAs.color))
+            .append(Component.text(maxHealth.toInt()).color(displayedAs.color))
     }
 }

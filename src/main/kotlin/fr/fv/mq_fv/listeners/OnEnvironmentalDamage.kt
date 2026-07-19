@@ -2,14 +2,11 @@ package fr.fv.mq_fv.listeners
 
 import fr.fv.mq_fv.dto.DamageCalculationResult
 import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
-import org.bukkit.damage.DamageScaling
-import org.bukkit.damage.DamageSource
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 
 /**
  * Handles player damage whose cause isn't another entity (fall, fire, lava, drowning,
@@ -34,6 +31,7 @@ class OnEnvironmentalDamage(): AbstractDamageHandler() {
         val damageCalculationResult = DamageCalculationResult(damage = event.damage, isCritical = false)
 
         targetPlayerHandler.requestDamageToThisPlayer(damageCalculationResult)
+        targetPlayerHandler.updatePlayerDisplayedInfos()
         this.displayDamageFloatingText(damageCalculationResult.damage, damageCalculationResult.isCritical, target.location)
 
         if( event.entity is LivingEntity ) {

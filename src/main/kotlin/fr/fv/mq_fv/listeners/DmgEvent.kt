@@ -85,6 +85,7 @@ class DmgEvent(): AbstractDamageHandler() {
             this.applyKnockBackToDamagee(target, knockBackOrigin)
             targetPlayerHandler.markPlayerAsHit()
             this.displayDamageFloatingText(damageCalculationResult.damage, damageCalculationResult.isCritical, target.location)
+            targetPlayerHandler.updatePlayerDisplayedInfos()
         }
         // player -> mob
         else if( target is LivingEntity ) {
@@ -123,6 +124,7 @@ class DmgEvent(): AbstractDamageHandler() {
             this.applyKnockBackToDamagee(target, knockBackOrigin)
             this.requestHurtAnimationToDamagee(target)
             targetPlayerHandler.markPlayerAsHit()
+            targetPlayerHandler.updatePlayerDisplayedInfos()
         }
         // mob -> mob
         else if( target is LivingEntity ) {
