@@ -10,8 +10,8 @@ ENV GID=1000
 
 # Server configuration
 ENV EULA=TRUE
-ENV TYPE=PAPER
-ENV VERSION=1.20.6
+ENV TYPE=CUSTOM
+ENV CUSTOM_SERVER=https://api.papermc.io/v2/projects/paper/versions/1.20.6/builds/151/downloads/paper-1.20.6-151.jar
 
 # OPs
 ENV OPS=JamesTheRefined,AWildSalami

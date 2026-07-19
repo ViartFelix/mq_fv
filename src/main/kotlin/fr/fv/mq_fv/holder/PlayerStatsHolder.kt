@@ -80,7 +80,7 @@ class PlayerStatsHolder {
      */
     fun calculateDamageToInflict(): DamageCalculationResult
     {
-        var calculatedDamage = DamageCalculationResult(damage = 1.0, isCritical = false)
+        var calculatedDamage = DamageCalculationResult(damage = 330.0, isCritical = false)
 
         getModifiersByType(PlayerStatisticType.OFFENSIVE)
             .forEach {

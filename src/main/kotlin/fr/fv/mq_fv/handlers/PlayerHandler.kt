@@ -6,6 +6,7 @@ import fr.fv.mq_fv.interfaces.entities.PlayerTable
 import fr.fv.mq_fv.repositories.PlayerRepository
 import fr.fv.mq_fv.helpers.PotionEffectsHelper
 import fr.fv.mq_fv.holder.PlayerStatsHolder
+import fr.fv.mq_fv.stats.PlayerStatistic
 import fr.fv.mq_fv.tabList.TabListHandler
 import fr.fv.mq_fv.utils.ComponentFactory
 import fr.fv.mq_fv.utils.ConfigurationsHolder
@@ -63,6 +64,14 @@ class PlayerHandler (
 
         scoreboardManager.addPlayerToHealthDisplayScore(mcPlayer)
         scoreboardManager.setHealthDisplayScoreForPlayer(mcPlayer, playerStats.currentHp)
+
+        /*
+        tabList.initTabList()
+
+        scoreboardManager.addPlayerToHealthDisplayScore(mcPlayer)
+
+        updatePlayerDisplayedInfos()
+         */
     }
 
     /**
@@ -92,6 +101,14 @@ class PlayerHandler (
     }
 
     /**
+     * Updates the player's health bar
+     */
+    fun updatePlayerHealthBar() {
+        val percent = (this.playerStats.currentHp / this.playerStats.getTargetStat(PlayerStatistic.LIFE).amount).toFloat()
+        mcPlayer.health = (mcPlayer.healthScale * percent)
+    }
+
+    /**
      * Calculates the damage reduction on this player from another player and applies said damage
      */
     fun requestDamageToThisPlayer(damage: DamageCalculationResult)
@@ -100,11 +117,13 @@ class PlayerHandler (
 
         val isPlayerDead = playerStats.removeHealth(finalDamageCalculation)
 
-        updateDisplayedHealth(playerStats.currentHp)
+        //updateDisplayedHealth(playerStats.currentHp)
 
         if( isPlayerDead ) {
             mcPlayer.damage(0.0)
             mcPlayer.health = 0.0
+        } else {
+            updatePlayerHealthBar()
         }
     }
 
@@ -135,5 +154,41 @@ class PlayerHandler (
     private fun updateDisplayedHealth(health: Double)
     {
         scoreboardManager.setHealthDisplayScoreForPlayer(mcPlayer, health)
+    }
+
+    /**
+     * Handles when the player dies
+     */
+    fun handleWhenPlayerDie()
+    {
+        markPlayerAsHit()
+
+        // set health to max
+        playerStats.addHealth(playerStats.getTargetStat(PlayerStatistic.LIFE).amount.toDouble())
+
+        // set hearts to max
+        mcPlayer.health = mcPlayer.healthScale
+
+        updatePlayerDisplayedInfos()
+    }
+
+    fun handleWhenPlayerRespawn()
+    {
+        markPlayerAsHit()
+        updatePlayerDisplayedInfos()
+    }
+
+    /**
+     * Updates what the player can see in the world (nametags, tablist, etc.).
+     */
+    private fun updatePlayerDisplayedInfos()
+    {
+        applyPotionEffects()
+        updatePlayerTab()
+
+        tabList.updateRightInfoTab(playerEntity, playerStats)
+        tabList.sendAllPackets(mcPlayer)
+
+        updateDisplayedHealth(playerStats.currentHp)
     }
 }

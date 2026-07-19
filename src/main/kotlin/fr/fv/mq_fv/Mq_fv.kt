@@ -1,11 +1,14 @@
 package fr.fv.mq_fv
 
+import fr.fv.mq_fv.commands.DamageCommand
 import fr.fv.mq_fv.handlers.AllPlayersHandlerHolder
 import fr.fv.mq_fv.interfaces.EventsRegisterer
 import fr.fv.mq_fv.listeners.*
 import fr.fv.mq_fv.runnable.TabRefreshRunnable
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import fr.fv.mq_fv.utils.DatabaseWrapper
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitScheduler
 
@@ -19,13 +22,26 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
     lateinit var scheduler: BukkitScheduler
         private set
 
+    /** All of this plugins event listeners to register */
+    private lateinit var bukkitEventListeners: List<Listener>
+
     override fun onEnable() {
         instance = this
 
         this.loadClasses()
         this.loadConfigFiles()
         this.initDbConnection()
+        this.bukkitEventListeners = listOf(
+            DmgEvent(),
+            OnPlayerJoin(),
+            OnTabRefreshRequest(),
+            OnPlayerDisconnect(),
+            OnPlayerRespawn(),
+            OnFoodLevelChange(),
+            OnRegainHealth(),
+        )
         this.registerEvents()
+        this.registerCommands()
         this.registerRunners()
     }
 
@@ -34,13 +50,22 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
 
     override fun registerEvents()
     {
-        server.pluginManager.registerEvents(DmgEvent(), this)
-        server.pluginManager.registerEvents(OnPlayerJoin(), this)
-        server.pluginManager.registerEvents(OnTabRefreshRequest(), this)
-        server.pluginManager.registerEvents(OnPlayerDisconnect(), this)
+        this.bukkitEventListeners.forEach {
+            server.pluginManager.registerEvents(it, this)
+        }
 
         // packets listener
         MainPacketListener.instance.registerAllPacketListeners()
+    }
+
+    /**
+     * Registers the plugin's commands
+     */
+    private fun registerCommands()
+    {
+        this.lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
+            event.registrar().register("dmg", DamageCommand())
+        }
     }
 
     /**
