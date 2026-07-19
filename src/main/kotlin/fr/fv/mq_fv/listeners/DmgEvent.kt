@@ -10,9 +10,10 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import org.bukkit.Color
 import org.bukkit.Location
-import org.bukkit.entity.EntityType
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -24,10 +25,11 @@ class DmgEvent(): Listener {
     fun onDamageEvent(event: EntityDamageByEntityEvent) {
         event.isCancelled = true
 
-        if( EntityType.PLAYER === event.damager.type ) {
-            this.handleWhenDamagerIsPlayer(event)
-        } else if( event.damager is LivingEntity ) {
-            this.handleWhenDamagerIsLivingEntity(event)
+        when( event.damager ) {
+            is Player -> this.handleWhenDamagerIsPlayer(event)
+            is Projectile -> this.handleWhenDamagerIsProjectile(event)
+            is LivingEntity -> this.handleWhenDamagerIsLivingEntity(event)
+            else -> {}
         }
     }
 
@@ -37,45 +39,7 @@ class DmgEvent(): Listener {
     private fun handleWhenDamagerIsPlayer(event: EntityDamageByEntityEvent) {
         val targetDamager = event.damager as Player
 
-        val playerHandlerInstance = AllPlayersHandlerHolder.instance
-        val targetPlayerHandler = playerHandlerInstance.getPlayerHandler(targetDamager)!!
-
-        val damageCalculationResult = targetPlayerHandler.playerStats.calculateDamageToInflict()
-
-        // player -> player
-        if( EntityType.PLAYER == event.entity.type ) {
-            // the target player
-            val targetPlayerDamagee = event.entity as Player
-            val targetDamageePlayerHandler = playerHandlerInstance.getPlayerHandler(targetPlayerDamagee)!!
-
-            if( !targetDamageePlayerHandler.isPlayerHittable() ) {
-                return
-            }
-
-            targetDamageePlayerHandler.requestDamageToThisPlayer(damageCalculationResult)
-            this.requestHurtAnimationToDamagee(targetPlayerDamagee)
-            this.applyKnockBackToDamagee(targetPlayerDamagee, targetDamager)
-            targetDamageePlayerHandler.markPlayerAsHit()
-        }
-        // player -> mob
-        else if( event.entity is LivingEntity ) {
-            val targetEntity = event.entity as LivingEntity
-
-            if( 0 >= targetEntity.health - damageCalculationResult.damage ) {
-                targetEntity.health = 0.0
-            } else {
-                //apply the damage to the target
-                targetEntity.health -= damageCalculationResult.damage
-                this.requestHurtAnimationToDamagee(targetEntity)
-                this.applyKnockBackToDamagee(targetEntity, targetDamager)
-            }
-        }
-
-        this.displayDamageFloatingText(
-            damageCalculationResult.damage,
-            damageCalculationResult.isCritical,
-            event.entity.location
-        )
+        this.applyPlayerDamageToTarget(targetDamager, event.entity, targetDamager.location)
     }
 
     /**
@@ -84,40 +48,101 @@ class DmgEvent(): Listener {
     private fun handleWhenDamagerIsLivingEntity(event: EntityDamageByEntityEvent)
     {
         val targetDamager = event.damager as LivingEntity
-        val damagee = event.entity
 
-        // mob -> player
-        if( damagee is Player ) {
-            // the target player
-            val targetPlayerDamagee = event.entity as Player
-            val targetDamageePlayerHandler = AllPlayersHandlerHolder.instance.getPlayerHandler(targetPlayerDamagee)!!
+        this.applyLivingEntityDamageToTarget(
+            event.entity, event.damage, event.isCritical, targetDamager.location
+        )
+    }
 
-            if( !targetDamageePlayerHandler.isPlayerHittable() ) {
+    /**
+     * Handles the damage event when the damager is a projectile (arrow, trident, etc.).
+     * The actual origin of the damage is the projectile's shooter.
+     */
+    private fun handleWhenDamagerIsProjectile(event: EntityDamageByEntityEvent)
+    {
+        val projectile = event.damager as Projectile
+
+        // knock back from the projectile's impact point, not the (possibly far away) shooter
+        when( val shooter = projectile.shooter ) {
+            is Player -> this.applyPlayerDamageToTarget(shooter, event.entity, projectile.location)
+            is LivingEntity -> this.applyLivingEntityDamageToTarget(
+                event.entity, event.damage, event.isCritical, projectile.location
+            )
+            else -> {}
+        }
+    }
+
+    /**
+     * Applies the damage from a player (whether by melee or by projectile) to the target entity
+     */
+    private fun applyPlayerDamageToTarget(attacker: Player, target: Entity, knockBackOrigin: Location)
+    {
+        val attackerHandler = AllPlayersHandlerHolder.instance.getPlayerHandler(attacker)!!
+
+        // player -> player
+        if( target is Player ) {
+            val targetPlayerHandler = AllPlayersHandlerHolder.instance.getPlayerHandler(target)!!
+
+            if( !targetPlayerHandler.isPlayerHittable() ) {
                 return
             }
 
-            val calculationRequest = DamageCalculationResult(
-                damage = event.damage,
-                isCritical = event.isCritical
-            )
+            val damageCalculationResult = attackerHandler.playerStats.calculateDamageToInflict()
 
-            targetDamageePlayerHandler.requestDamageToThisPlayer(calculationRequest)
-            this.displayDamageFloatingText(calculationRequest.damage, calculationRequest.isCritical, damagee.location)
-            this.applyKnockBackToDamagee(targetPlayerDamagee, targetDamager)
-            this.requestHurtAnimationToDamagee(targetPlayerDamagee)
-            targetDamageePlayerHandler.markPlayerAsHit()
+            targetPlayerHandler.requestDamageToThisPlayer(damageCalculationResult)
+            this.requestHurtAnimationToDamagee(target)
+            this.applyKnockBackToDamagee(target, knockBackOrigin)
+            targetPlayerHandler.markPlayerAsHit()
+            this.displayDamageFloatingText(damageCalculationResult.damage, damageCalculationResult.isCritical, target.location)
+        }
+        // player -> mob
+        else if( target is LivingEntity ) {
+            val damageCalculationResult = attackerHandler.playerStats.calculateDamageToInflict()
+
+            if( 0 >= target.health - damageCalculationResult.damage ) {
+                target.health = 0.0
+            } else {
+                target.health -= damageCalculationResult.damage
+                this.requestHurtAnimationToDamagee(target)
+                this.applyKnockBackToDamagee(target, knockBackOrigin)
+            }
+
+            this.displayDamageFloatingText(damageCalculationResult.damage, damageCalculationResult.isCritical, target.location)
+        }
+    }
+
+    /**
+     * Applies the damage from a living entity, ie. a mob, (whether by melee or by projectile) to the target entity
+     */
+    private fun applyLivingEntityDamageToTarget(
+        target: Entity, damage: Double, isCritical: Boolean, knockBackOrigin: Location
+    ) {
+        // mob -> player
+        if( target is Player ) {
+            val targetPlayerHandler = AllPlayersHandlerHolder.instance.getPlayerHandler(target)!!
+
+            if( !targetPlayerHandler.isPlayerHittable() ) {
+                return
+            }
+
+            val calculationRequest = DamageCalculationResult(damage = damage, isCritical = isCritical)
+
+            targetPlayerHandler.requestDamageToThisPlayer(calculationRequest)
+            this.displayDamageFloatingText(calculationRequest.damage, calculationRequest.isCritical, target.location)
+            this.applyKnockBackToDamagee(target, knockBackOrigin)
+            this.requestHurtAnimationToDamagee(target)
+            targetPlayerHandler.markPlayerAsHit()
         }
         // mob -> mob
-        else if( damagee is LivingEntity ) {
-            this.displayDamageFloatingText(event.damage, event.isCritical, damagee.location)
-            val finalTargetHealth = damagee.health - event.damage
+        else if( target is LivingEntity ) {
+            this.displayDamageFloatingText(damage, isCritical, target.location)
 
-            if( 0 >= finalTargetHealth ) {
-                damagee.health = 0.0
+            if( 0 >= target.health - damage ) {
+                target.health = 0.0
             } else {
-                damagee.health -= event.damage
-                this.applyKnockBackToDamagee(damagee, targetDamager)
-                this.requestHurtAnimationToDamagee(damagee)
+                target.health -= damage
+                this.applyKnockBackToDamagee(target, knockBackOrigin)
+                this.requestHurtAnimationToDamagee(target)
             }
         }
     }
@@ -149,13 +174,13 @@ class DmgEvent(): Listener {
     }
 
     /**
-     * Applies a knock back to the damagee target
+     * Applies a knock back to the damagee target, away from the given origin location
      */
     private fun applyKnockBackToDamagee(
-        target: LivingEntity, origin: LivingEntity, strength: Double = 0.4, yBoost: Double = 0.75
+        target: LivingEntity, originLocation: Location, strength: Double = 0.4, yBoost: Double = 0.75
     ) {
         val direction = target.location.toVector()
-            .subtract(origin.location.toVector())
+            .subtract(originLocation.toVector())
             .normalize()
 
         direction.y = yBoost
@@ -164,13 +189,14 @@ class DmgEvent(): Listener {
     }
 
     /**
-     * Sends a packet to play the animation where an entity is hurt (turns red)
+     * Sends a packet to play the animation where an entity is hurt (turns red).
+     * Only sent to players who actually have the entity loaded client-side.
      */
     private fun requestHurtAnimationToDamagee(target: LivingEntity) {
         val animation = FakeHurtAnimation(target, 0.0f)
         animation.buildPacket()
 
-        Bukkit.getOnlinePlayers()
+        target.trackedBy
             .forEach {
                 animation.sendPacket(it)
             }
