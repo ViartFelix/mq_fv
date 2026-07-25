@@ -41,6 +41,7 @@ class Mq_fv : JavaPlugin(), EventsRegisterer {
             OnPlayerRespawn(),
             OnFoodLevelChange(),
             OnRegainHealth(),
+            OnPlayerToggleFlight(),
         )
         this.registerEvents()
         this.registerCommands()

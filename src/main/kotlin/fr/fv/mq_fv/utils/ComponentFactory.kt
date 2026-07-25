@@ -217,14 +217,25 @@ class ComponentFactory {
      * Builds the component for the action bar of the player
      */
     fun buildActionBarInfos(
-        currentHealth: Double, maxHealth: Double, displayedAs: PlayerStatistic = PlayerStatistic.LIFE
+        currentHealth: Double,
+        maxHealth: Double,
+        usedJumps: Int,
+        maxJumps: Int,
+        healthStat: PlayerStatistic = PlayerStatistic.LIFE,
+        jumpStat: PlayerStatistic = PlayerStatistic.JUMPS,
     ): Component {
         return Component
             .text("")
-            .append(Component.text(displayedAs.symbol).color(displayedAs.color))
+            .append(Component.text(healthStat.symbol).color(healthStat.color))
             .append(Component.text(" "))
-            .append(Component.text(currentHealth.roundToInt()).color(displayedAs.color))
-            .append(Component.text("/").color(displayedAs.color))
-            .append(Component.text(maxHealth.toInt()).color(displayedAs.color))
+            .append(Component.text(currentHealth.roundToInt()).color(healthStat.color))
+            .append(Component.text("/").color(healthStat.color))
+            .append(Component.text(maxHealth.toInt()).color(healthStat.color))
+            .append(Component.text("  |  "))
+            .append(Component.text(jumpStat.symbol).color(jumpStat.color))
+            .append(Component.text(" "))
+            .append(Component.text(usedJumps).color(jumpStat.color))
+            .append(Component.text("/").color(jumpStat.color))
+            .append(Component.text(maxJumps).color(jumpStat.color))
     }
 }

@@ -4,6 +4,7 @@ import fr.fv.mq_fv.dto.DamageCalculationResult
 import fr.fv.mq_fv.exceptions.PlayerStatisticException
 import fr.fv.mq_fv.stats.PlayerStatistic
 import fr.fv.mq_fv.stats.PlayerStatisticType
+import kotlin.math.floor
 
 /**
  * Will hold player statistics
@@ -14,7 +15,7 @@ class PlayerStatsHolder {
     private val stats: List<SinglePlayerStat> = listOf(
         SinglePlayerStat(100.0f, PlayerStatistic.LIFE),
         SinglePlayerStat(5.0f, PlayerStatistic.DEFENCE),
-        SinglePlayerStat(2.0f, PlayerStatistic.JUMPS),
+        SinglePlayerStat(10.0f, PlayerStatistic.JUMPS),
 
         SinglePlayerStat(10.0f, PlayerStatistic.ATTACK),
         SinglePlayerStat(30.0f, PlayerStatistic.CRITICAL_CHANCE),
@@ -22,6 +23,12 @@ class PlayerStatsHolder {
     )
 
     var currentHp: Double = 100.0
+        private set
+
+    /**
+     * How much does the player has jumped mid-air.
+     */
+    var jumpAmount: Int = 0
         private set
 
     /**
@@ -130,5 +137,16 @@ class PlayerStatsHolder {
         }
 
         return 0 >= currentHp
+    }
+
+
+    fun resetJumpCount()
+    {
+        jumpAmount = floor(getTargetStat(PlayerStatistic.JUMPS).amount).toInt()
+    }
+
+    fun useJump()
+    {
+        jumpAmount -= 1
     }
 }

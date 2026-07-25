@@ -11,6 +11,7 @@ import fr.fv.mq_fv.tabList.TabListHandler
 import fr.fv.mq_fv.utils.ComponentFactory
 import fr.fv.mq_fv.utils.ConfigurationsHolder
 import org.bukkit.entity.Player
+import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
@@ -64,6 +65,8 @@ class PlayerHandler (
 
         scoreboardManager.addPlayerToHealthDisplayScore(mcPlayer)
         scoreboardManager.setHealthDisplayScoreForPlayer(mcPlayer, playerStats.currentHp)
+
+        playerStats.resetJumpCount()
 
         /*
         tabList.initTabList()
@@ -170,6 +173,7 @@ class PlayerHandler (
         mcPlayer.health = mcPlayer.healthScale
 
         updatePlayerDisplayedInfos()
+        playerStats.resetJumpCount()
     }
 
     /**
@@ -177,6 +181,7 @@ class PlayerHandler (
      */
     fun updatePlayerDisplayedInfos()
     {
+        mcPlayer.allowFlight = true
         applyPotionEffects()
         updatePlayerTab()
 
@@ -189,8 +194,10 @@ class PlayerHandler (
         // update the action bar
         mcPlayer.sendActionBar(
             ComponentFactory().buildActionBarInfos(
-                this.playerStats.currentHp,
-                this.playerStats.getTargetStat(PlayerStatistic.LIFE).amount.toDouble()
+                playerStats.currentHp,
+                playerStats.getTargetStat(PlayerStatistic.LIFE).amount.toDouble(),
+                playerStats.jumpAmount,
+                floor(playerStats.getTargetStat(PlayerStatistic.JUMPS).amount).toInt()
             )
         )
     }
